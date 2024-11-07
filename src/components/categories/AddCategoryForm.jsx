@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { CategoryService } from "../../services/category.service";
 
-const AddCategoryForm = ({ setCategories, setError, categoryService }) => {
+const AddCategoryForm = ({ setCategories, setError }) => {
   const categoryInitial = {
     name: "",
     description: "",
@@ -61,7 +61,12 @@ const AddCategoryForm = ({ setCategories, setError, categoryService }) => {
 
     const makeCreateApiRequest = async () => {
       try {
-        const response = await categoryService.createCategory(newCategory);
+        const abortController = new AbortController();
+        const signal = abortController.signal;
+        const response = await CategoryService.createCategory(
+          newCategory,
+          signal
+        );
         console.log(response);
         setCategories((prev) => [...prev, { ...newCategory, id: response.id }]);
         setErrors(errorsInitial);

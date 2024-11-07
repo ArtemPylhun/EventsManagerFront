@@ -16,7 +16,7 @@ const Layout = () => {
           </li>
         </ul>
       </nav>
-      <div class="content">
+      <div className="content">
         <Outlet />
       </div>
     </>

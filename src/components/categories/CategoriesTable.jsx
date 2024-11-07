@@ -1,25 +1,19 @@
 import React from "react";
 import { useEditCategory } from "../../hooks/categories/useEditCategory";
 import { CategoryService } from "../../services/category.service";
-
-const CategoriesTable = ({
-  categories,
-  setCategories,
-  categoryService,
-  setError,
-}) => {
+const CategoriesTable = ({ categories, setCategories, setError }) => {
   const {
     editCategory,
     editErrors,
     onEditClick,
     handleEditCategoryChange,
     handleEditCategorySave,
-  } = useEditCategory(setCategories, categoryService, setError);
+  } = useEditCategory(setCategories, setError);
 
   const onCategoryDelete = (id) => {
-    const makeDeleteApiRequest = async () => {
+    const makeDeleteApiRequest = async (signal) => {
       try {
-        await categoryService.deleteCategoryById(id);
+        await CategoryService.deleteCategoryById(id, signal);
         setCategories((prev) => prev.filter((el) => el.id !== id));
       } catch (error) {
         console.log(error);
@@ -31,7 +25,8 @@ const CategoriesTable = ({
       }
     };
 
-    makeDeleteApiRequest();
+    const abortController = new AbortController();
+    makeDeleteApiRequest(abortController.signal);
   };
 
   if (categories.length === 0) {

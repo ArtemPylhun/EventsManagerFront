@@ -11,21 +11,18 @@ const CategoryComponent = () => {
   const [error, setError] = useState(null);
   const [filterQuery, setFilterQuery] = useState("");
 
-  let categoryService = new CategoryService();
-
   useEffect(() => {
     let isMounted = true;
     const abortController = new AbortController();
-    const signal = abortController.signal;
-    categoryService = new CategoryService(signal);
 
     const fetchCategories = async () => {
       try {
         setLoading(true);
         setError(null);
 
-        const response = await categoryService.getAllCategories();
-
+        const response = await CategoryService.getAllCategories(
+          abortController.signal
+        );
         if (isMounted) {
           setCategories(response);
         }
@@ -48,14 +45,15 @@ const CategoryComponent = () => {
     setFilterQuery(event.target.value);
   };
 
-  const filteredCategories = categories.filter((category) =>
-    Object.keys(category).some((key) => {
-      if (key === "id") return false;
-      return String(category[key])
-        .toLowerCase()
-        .includes(filterQuery.toLowerCase());
-    })
-  );
+  const filteredCategories =
+    categories?.filter((category) =>
+      Object.keys(category).some((key) => {
+        if (key === "id") return false;
+        return String(category[key])
+          .toLowerCase()
+          .includes(filterQuery.toLowerCase());
+      })
+    ) || [];
 
   return (
     <div>
@@ -67,16 +65,11 @@ const CategoryComponent = () => {
         onQueryChange={handleFilterQueryChange}
       />
 
-      <AddCategoryForm
-        setCategories={setCategories}
-        setError={setError}
-        categoryService={categoryService}
-      />
+      <AddCategoryForm setCategories={setCategories} setError={setError} />
 
       <CategoriesTable
         categories={filteredCategories}
         setCategories={setCategories}
-        categoryService={categoryService}
         setError={setError}
       />
     </div>

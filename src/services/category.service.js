@@ -1,40 +1,91 @@
 import { HttpClient } from "../utils/http/HttpClient";
 
 export class CategoryService {
-  constructor(signal) {
+  /**
+   * @param {AbortSignal} signal
+   */
+  static async getAllCategories(signal) {
     const apiUrl = import.meta.env.VITE_API_BASE_URL;
-    this.httpClient = new HttpClient({
+    const httpClient = new HttpClient({
       baseURL: `${apiUrl}/categories`,
       timeout: 10000,
       signal,
     });
+    return await httpClient.get("");
   }
 
-  async getAllCategories() {
-    return await this.httpClient.get("");
+  /**
+   * @param {number} id
+   * @param {AbortSignal} signal
+   */
+  static async getCategoryById(id, signal) {
+    const apiUrl = import.meta.env.VITE_API_BASE_URL;
+    const httpClient = new HttpClient({
+      baseURL: `${apiUrl}/categories`,
+      timeout: 10000,
+      signal,
+    });
+    return await httpClient.get(`/${id}`);
   }
 
-  async getCategoryById() {
-    return await this.httpClient.get(`/${id}`);
-  }
-
+  /**
+   * @param {number} limit
+   * @param {number} skip
+   * @param {AbortSignal} signal
+   */
   /*
-  async getPaginatedTodos(limit, skip) {
-    return await this.httpClient.get(
+  static async getPaginatedTodos(limit, skip, signal) {
+    const apiUrl = import.meta.env.VITE_API_BASE_URL;
+    const httpClient = new HttpClient({
+      baseURL: `${apiUrl}/categories`,
+      timeout: 10000,
+      signal,
+    });
+    return await httpClient.get(
       `?limit=${limit}&skip=${skip}`
     );
   }
   */
 
-  async createCategory(category) {
-    return await this.httpClient.post("", category);
+  /**
+   * @param {object} category
+   * @param {AbortSignal} signal
+   */
+  static async createCategory(category, signal) {
+    const apiUrl = import.meta.env.VITE_API_BASE_URL;
+    const httpClient = new HttpClient({
+      baseURL: `${apiUrl}/categories`,
+      timeout: 10000,
+      signal,
+    });
+    return await httpClient.post("", category);
   }
 
-  async updateCategory(category) {
-    return await this.httpClient.put("", category);
+  /**
+   * @param {object} category
+   * @param {AbortSignal} signal
+   */
+  static async updateCategory(category, signal) {
+    const apiUrl = import.meta.env.VITE_API_BASE_URL;
+    const httpClient = new HttpClient({
+      baseURL: `${apiUrl}/categories`,
+      timeout: 10000,
+      signal,
+    });
+    return await httpClient.put("", category);
   }
 
-  async deleteCategoryById(id) {
-    return await this.httpClient.delete(`/${id}`);
+  /**
+   * @param {number} id
+   * @param {AbortSignal} signal
+   */
+  static async deleteCategoryById(id, signal) {
+    const apiUrl = import.meta.env.VITE_API_BASE_URL;
+    const httpClient = new HttpClient({
+      baseURL: `${apiUrl}/categories`,
+      timeout: 10000,
+      signal,
+    });
+    return await httpClient.delete(`/${id}`);
   }
 }

@@ -1,6 +1,7 @@
 import React, { useState } from "react";
+import { CategoryService } from "../../services/category.service";
 
-export const useEditCategory = (setCategories, categoryService, setError) => {
+export const useEditCategory = (setCategories, setError) => {
   const categoryInitial = {
     id: "",
     name: "",
@@ -60,7 +61,12 @@ export const useEditCategory = (setCategories, categoryService, setError) => {
 
     const makeUpdateApiRequest = async () => {
       try {
-        const response = await categoryService.updateCategory(editCategory);
+        const abortController = new AbortController();
+        const signal = abortController.signal;
+        const response = await CategoryService.updateCategory(
+          editCategory,
+          signal
+        );
 
         setCategories((prev) =>
           prev.map((el) => {
