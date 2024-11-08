@@ -5,6 +5,7 @@ import Register from "../components/auth/Register";
 import Login from "../components/auth/Login";
 import EventsList from "../components/events/EventsList";
 import NotFoundPage from "../components/NotFoundPage";
+import CategoryComponent from "../components/categories/CategoryComponent";
 
 const Router = () => {
   return (
@@ -16,6 +17,7 @@ const Router = () => {
           <Route index element={<EventsList />} />
         </Route>
         <Route path="*" element={<NotFoundPage />} />
+        <Route path="/categories" element={<CategoryComponent />} />
       </Routes>
     </BrowserRouter>
   );

@@ -11,6 +11,9 @@ const Layout = () => {
           <li>
             <a href="/users">Users</a>
           </li>
+          <li>
+            <a href="/categories">Categories</a>
+          </li>
         </ul>
       </nav>
       <div class="content">
