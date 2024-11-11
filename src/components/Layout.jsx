@@ -14,6 +14,9 @@ const Layout = () => {
           <li>
             <a href="/categories">Categories</a>
           </li>
+          <li>
+            <a href="/tags">Tags</a>
+          </li>
         </ul>
       </nav>
       <div className="content">
