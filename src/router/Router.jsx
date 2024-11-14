@@ -6,6 +6,7 @@ import Login from "../components/auth/Login";
 import EventsList from "../components/events/EventsList";
 import NotFoundPage from "../components/NotFoundPage";
 import CategoryComponent from "../components/categories/CategoryComponent";
+import TagComponent from "../components/tags/TagComponent";
 
 const Router = () => {
   return (
@@ -18,6 +19,7 @@ const Router = () => {
         </Route>
         <Route path="*" element={<NotFoundPage />} />
         <Route path="/categories" element={<CategoryComponent />} />
+        <Route path="/tags" element={<TagComponent />} />
       </Routes>
     </BrowserRouter>
   );
