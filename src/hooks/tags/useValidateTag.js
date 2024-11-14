@@ -7,7 +7,7 @@ export const useValidateTag = () => {
 
   const [tagValidationErrors, setTagValidationErrors] = useState(errorsInitial);
 
-  const validateTag = (title, description) => {
+  const validateTag = (title) => {
     if (title.trim().length < 3 || title.trim().length > 255) {
       if (title.trim().length < 3) {
         setTagValidationErrors((prev) => {

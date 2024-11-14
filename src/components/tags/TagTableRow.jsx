@@ -3,7 +3,6 @@ import { useValidateTag } from "../../hooks/tags/useValidateTag";
 
 const TagTableRowComponent = ({ tag, onTagDelete, onSaveTagButtonClick }) => {
   const { tagValidationErrors, validateTag } = useValidateTag();
-  console.log(tag);
   const memoizedTagTitleValue = useMemo(() => tag.title, [tag.title]);
 
   const [tagTitle, setTagTitle] = useState(memoizedTagTitleValue);

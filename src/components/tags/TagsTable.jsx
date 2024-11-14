@@ -4,7 +4,6 @@ const TagsTable = ({ tags, onTagItemDelete, onSaveTagButtonClick }) => {
   if (tags.length === 0) {
     return <p>No data</p>;
   }
-  console.log(tags);
   return (
     <table>
       <thead>

@@ -1,16 +1,13 @@
 import React, { useState } from "react";
 import { TagService } from "../../services/tag.service";
-
+import { useValidateTag } from "../../hooks/tags/useValidateTag";
 const AddTagForm = ({ setTags, setError }) => {
   const tagInitial = {
-    title: "",
-  };
-  const errorsInitial = {
-    title: "",
+    name: "",
   };
 
   const [newTag, setNewTag] = useState(tagInitial);
-  const [errors, setErrors] = useState(errorsInitial);
+  let { tagValidationErrors, validateTag } = useValidateTag();
 
   const onTagChange = (event) => {
     setNewTag({
@@ -22,48 +19,35 @@ const AddTagForm = ({ setTags, setError }) => {
   const onSubmit = (event) => {
     event.preventDefault();
 
-    if (newTag.title.trim().length < 3 || newTag.title.trim().length > 255) {
-      if (newTag.title.trim().length < 3) {
-        setErrors((prev) => ({
-          ...prev,
-          title: "The tag title must be at least 3 letters long",
-        }));
-      }
-      if (newTag.title.trim().length > 255) {
-        setErrors((prev) => ({
-          ...prev,
-          title: "The tag title must be less than 255 letters long",
-        }));
-      }
-      return;
-    }
-
-    const makeCreateApiRequest = async () => {
-      try {
-        const abortController = new AbortController();
-        const signal = abortController.signal;
-        const response = await TagService.createTag(newTag, signal);
-        console.log(response);
-        setTags((prev) => [...prev, { ...newTag, id: response.id }]);
-        setErrors(errorsInitial);
-        setNewTag(tagInitial);
-      } catch (error) {
-        console.log(error);
-        if (error.response && error.response.status === 409) {
-          setError(error.response.data);
-        } else {
-          setError(error.message);
+    if (validateTag(newTag.title)) {
+      const makeCreateApiRequest = async () => {
+        try {
+          const abortController = new AbortController();
+          const signal = abortController.signal;
+          const response = await TagService.createTag(newTag, signal);
+          setTags((prev) => [...prev, { ...newTag, id: response.id }]);
+          setErrors(errorsInitial);
+          setNewTag(tagInitial);
+        } catch (error) {
+          console.log(error);
+          if (error.response && error.response.status === 409) {
+            setError(error.response.data);
+          } else {
+            setError(error.message);
+          }
         }
-      }
-    };
+      };
 
-    makeCreateApiRequest();
+      makeCreateApiRequest();
+    }
   };
 
   return (
     <form onSubmit={onSubmit}>
       <input value={newTag.title} name="title" onChange={onTagChange} />
-      {errors.title && <p style={{ color: "darkred" }}>{errors.title}</p>}
+      {tagValidationErrors.title && (
+        <p style={{ color: "darkred" }}>{tagValidationErrors.title}</p>
+      )}
       <button style={{ margin: "0px 10px" }} type="submit">
         Add
       </button>
