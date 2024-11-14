@@ -14,7 +14,7 @@ const AddCategoryForm = ({ setCategories, setError }) => {
   const [newCategory, setNewCategory] = useState(categoryInitial);
   const [errors, setErrors] = useState(errorsInitial);
 
-  const onAddressBookChange = (event) => {
+  const onCategoryChange = (event) => {
     setNewCategory({
       ...newCategory,
       [event.target.name]: event.target.value,
@@ -86,17 +86,13 @@ const AddCategoryForm = ({ setCategories, setError }) => {
 
   return (
     <form onSubmit={onSubmit}>
-      <input
-        value={newCategory.name}
-        name="name"
-        onChange={onAddressBookChange}
-      />
+      <input value={newCategory.name} name="name" onChange={onCategoryChange} />
       {errors.name && <p style={{ color: "darkred" }}>{errors.name}</p>}
 
       <input
         value={newCategory.description}
         name="description"
-        onChange={onAddressBookChange}
+        onChange={onCategoryChange}
       />
       {errors.description && (
         <p style={{ color: "darkred" }}>{errors.description}</p>
