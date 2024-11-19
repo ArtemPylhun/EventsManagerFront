@@ -12,14 +12,14 @@ const Router = () => {
   return (
     <BrowserRouter>
       <Routes>
+        <Route path="*" element={<NotFoundPage />} />
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
         <Route path="/" element={<Layout />}>
           <Route index element={<EventsList />} />
+          <Route path="/categories" element={<CategoryComponent />} />
+          <Route path="/tags" element={<TagComponent />} />
         </Route>
-        <Route path="*" element={<NotFoundPage />} />
-        <Route path="/categories" element={<CategoryComponent />} />
-        <Route path="/tags" element={<TagComponent />} />
       </Routes>
     </BrowserRouter>
   );
