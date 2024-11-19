@@ -90,8 +90,6 @@ const CategoryComponent = () => {
                 return el;
               })
             );
-            setEditErrors(errorsInitial);
-            setEditCategory(categoryInitial);
           } catch (error) {
             console.log(error);
             if (error.status === 409) {
