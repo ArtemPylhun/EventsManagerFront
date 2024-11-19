@@ -67,12 +67,10 @@ export class HttpClient {
         return Promise.reject(error);
       }
     );
-    //TODO: fix part of redirecting to login page and fixing errors when there is no token
     this.axiosInstance.interceptors.response.use(
       (response) => response,
       (error) => {
         if (error.response) {
-          // Server responded with a status code outside of 2xx
           console.error(
             "Request failed with error:",
             error.response.status,
@@ -84,10 +82,8 @@ export class HttpClient {
               "/login?returnUrl=" + window.location.pathname;
           }
         } else if (error.request) {
-          // No response was received
           console.error("No response received:", error.request);
         } else {
-          // Something else triggered the error
           console.error("Unexpected error occurred", error.message);
         }
         return Promise.reject(error);
