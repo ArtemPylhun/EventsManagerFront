@@ -15,7 +15,6 @@ export class HttpClient {
 
     this.signal = signal;
 
-    // Uncomment if you need interceptors
     this.initInterceptors();
   }
 

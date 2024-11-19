@@ -1,4 +1,5 @@
 import React from "react";
+import { jwtDecode } from "jwt-decode";
 import { UserService } from "../../services/user.service";
 import { useNavigate, useLocation } from "react-router-dom";
 
@@ -13,7 +14,9 @@ const Login = () => {
     const response = await UserService.login(email, password);
 
     if (response) {
+      let decoded = jwtDecode(response);
       localStorage.setItem("token", response);
+      localStorage.setItem("user", JSON.stringify(decoded));
 
       const params = new URLSearchParams(location.search);
       const returnUrl = params.get("returnUrl") || "/";
