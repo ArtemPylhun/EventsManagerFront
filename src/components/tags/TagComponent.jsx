@@ -84,8 +84,6 @@ const TagComponent = () => {
               return el;
             })
           );
-          setEditErrors(errorsInitial);
-          setEditTag(tagInitial);
         } catch (error) {
           console.log(error);
           if (error.status === 409) {
