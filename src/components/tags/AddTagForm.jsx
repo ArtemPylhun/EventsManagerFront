@@ -3,12 +3,11 @@ import { TagService } from "../../services/tag.service";
 import { useValidateTag } from "../../hooks/tags/useValidateTag";
 const AddTagForm = ({ setTags, setError }) => {
   const tagInitial = {
-    name: "",
+    title: "",
   };
 
   const [newTag, setNewTag] = useState(tagInitial);
   let { tagValidationErrors, validateTag } = useValidateTag();
-
   const onTagChange = (event) => {
     setNewTag({
       ...newTag,
@@ -26,7 +25,6 @@ const AddTagForm = ({ setTags, setError }) => {
           const signal = abortController.signal;
           const response = await TagService.createTag(newTag, signal);
           setTags((prev) => [...prev, { ...newTag, id: response.id }]);
-          setErrors(errorsInitial);
           setNewTag(tagInitial);
         } catch (error) {
           console.log(error);

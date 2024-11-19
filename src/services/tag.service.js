@@ -8,7 +8,6 @@ export class TagService {
     const apiUrl = import.meta.env.VITE_API_BASE_URL;
     const httpClient = new HttpClient({
       baseURL: `${apiUrl}/tags`,
-      timeout: 10000,
       signal,
     });
     return await httpClient.get("");
@@ -22,7 +21,6 @@ export class TagService {
     const apiUrl = import.meta.env.VITE_API_BASE_URL;
     const httpClient = new HttpClient({
       baseURL: `${apiUrl}/tags`,
-      timeout: 10000,
       signal,
     });
     return await httpClient.get(`/${id}`);
@@ -36,10 +34,9 @@ export class TagService {
     const apiUrl = import.meta.env.VITE_API_BASE_URL;
     const httpClient = new HttpClient({
       baseURL: `${apiUrl}/tags`,
-      timeout: 10000,
       signal,
     });
-    return await httpClient.post("", tag);
+    return await httpClient.post("add", tag);
   }
 
   /**
@@ -50,10 +47,9 @@ export class TagService {
     const apiUrl = import.meta.env.VITE_API_BASE_URL;
     const httpClient = new HttpClient({
       baseURL: `${apiUrl}/tags`,
-      timeout: 10000,
       signal,
     });
-    return await httpClient.put("", tag);
+    return await httpClient.put("update", tag);
   }
   /**
    * @param {number} id
@@ -63,9 +59,8 @@ export class TagService {
     const apiUrl = import.meta.env.VITE_API_BASE_URL;
     const httpClient = new HttpClient({
       baseURL: `${apiUrl}/tags`,
-      timeout: 10000,
       signal,
     });
-    return await httpClient.delete(`/${id}`);
+    return await httpClient.delete(`delete/${id}`);
   }
 }
