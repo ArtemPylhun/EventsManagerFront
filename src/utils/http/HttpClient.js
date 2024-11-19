@@ -4,7 +4,6 @@ export class HttpClient {
   constructor(configs, signal) {
     this.axiosInstance = axios.create({
       baseURL: configs.baseURL,
-      timeout: configs.timeout || 3000,
       headers: {
         "Content-Type": "application/json",
         Accept: "application/json",

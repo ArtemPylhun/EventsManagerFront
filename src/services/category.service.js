@@ -8,7 +8,6 @@ export class CategoryService {
     const apiUrl = import.meta.env.VITE_API_BASE_URL;
     const httpClient = new HttpClient({
       baseURL: `${apiUrl}/categories`,
-      timeout: 10000,
       signal,
     });
     return await httpClient.get("");
@@ -22,7 +21,6 @@ export class CategoryService {
     const apiUrl = import.meta.env.VITE_API_BASE_URL;
     const httpClient = new HttpClient({
       baseURL: `${apiUrl}/categories`,
-      timeout: 10000,
       signal,
     });
     return await httpClient.get(`/${id}`);
@@ -38,7 +36,6 @@ export class CategoryService {
     const apiUrl = import.meta.env.VITE_API_BASE_URL;
     const httpClient = new HttpClient({
       baseURL: `${apiUrl}/categories`,
-      timeout: 10000,
       signal,
     });
     return await httpClient.get(
@@ -55,10 +52,9 @@ export class CategoryService {
     const apiUrl = import.meta.env.VITE_API_BASE_URL;
     const httpClient = new HttpClient({
       baseURL: `${apiUrl}/categories`,
-      timeout: 10000,
       signal,
     });
-    return await httpClient.post("", category);
+    return await httpClient.post("/add", category);
   }
 
   /**
@@ -69,10 +65,9 @@ export class CategoryService {
     const apiUrl = import.meta.env.VITE_API_BASE_URL;
     const httpClient = new HttpClient({
       baseURL: `${apiUrl}/categories`,
-      timeout: 10000,
       signal,
     });
-    return await httpClient.put("", category);
+    return await httpClient.put("/update", category);
   }
 
   /**
@@ -83,9 +78,8 @@ export class CategoryService {
     const apiUrl = import.meta.env.VITE_API_BASE_URL;
     const httpClient = new HttpClient({
       baseURL: `${apiUrl}/categories`,
-      timeout: 10000,
       signal,
     });
-    return await httpClient.delete(`/${id}`);
+    return await httpClient.delete(`/delete/${id}`);
   }
 }
