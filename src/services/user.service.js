@@ -16,6 +16,6 @@ export class UserService {
       baseURL: `${apiUrl}/users`,
       signal,
     });
-    return await httpClient.post("/register", { user });
+    return await httpClient.post("/register", { ...user });
   }
 }
