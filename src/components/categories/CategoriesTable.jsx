@@ -1,5 +1,15 @@
 import React from "react";
+import {
+  TableContainer,
+  Table,
+  TableHead,
+  TableRow,
+  TableCell,
+  TableBody,
+  Paper,
+} from "@mui/material";
 import CategoryTableRow from "./CategoryTableRow";
+
 const CategoriesTable = ({
   categories,
   onCategoryItemDelete,
@@ -10,25 +20,27 @@ const CategoriesTable = ({
   }
 
   return (
-    <table>
-      <thead>
-        <tr>
-          <th>Name</th>
-          <th>Description</th>
-          <th>Actions</th>
-        </tr>
-      </thead>
-      <tbody>
-        {categories.map((category) => (
-          <CategoryTableRow
-            key={category.id}
-            category={category}
-            onCategoryDelete={onCategoryItemDelete}
-            onSaveCategoryButtonClick={onSaveCategoryButtonClick}
-          />
-        ))}
-      </tbody>
-    </table>
+    <TableContainer component={Paper} sx={{ marginY: "1rem" }}>
+      <Table>
+        <TableHead>
+          <TableRow>
+            <TableCell align="center">Name</TableCell>
+            <TableCell align="center">Description</TableCell>
+            <TableCell align="center">Actions</TableCell>
+          </TableRow>
+        </TableHead>
+        <TableBody>
+          {categories.map((category) => (
+            <CategoryTableRow
+              key={category.id}
+              category={category}
+              onCategoryDelete={onCategoryItemDelete}
+              onCategoryUpdate={onSaveCategoryButtonClick}
+            />
+          ))}
+        </TableBody>
+      </Table>
+    </TableContainer>
   );
 };
 

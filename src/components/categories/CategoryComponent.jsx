@@ -1,15 +1,24 @@
-import { useEffect, useState, useCallback } from "react";
-import React from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import { CategoryService } from "../../services/category.service";
 import CategoriesTable from "./CategoriesTable";
 import SearchInput from "../SearchInput";
 import AddCategoryForm from "./AddCategoryForm";
+import NotificationSnackbar from "../NotificationSnackbar";
+import { useValidateCategory } from "../../hooks/categories/useValidateCategory";
 
 const CategoryComponent = () => {
+  const notificationInitial = {
+    message: "",
+    severity: "",
+  };
+
   const [categories, setCategories] = useState([]);
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState(null);
+  const [notification, setNotification] = useState(notificationInitial);
   const [filterQuery, setFilterQuery] = useState("");
+  const [isSnackbarOpen, setIsSnackbarOpen] = useState(false);
+
+  const { validateCategory, validationError } = useValidateCategory();
 
   useEffect(() => {
     let isMounted = true;
@@ -18,7 +27,7 @@ const CategoryComponent = () => {
     const fetchCategories = async () => {
       try {
         setLoading(true);
-        setError(null);
+        setNotification(notificationInitial);
 
         const response = await CategoryService.getAllCategories(
           abortController.signal
@@ -27,7 +36,10 @@ const CategoryComponent = () => {
           setCategories(response);
         }
       } catch (error) {
-        setError(error.message);
+        handleNotificationChange({
+          message: error.message,
+          severity: "error",
+        });
       } finally {
         setLoading(false);
       }
@@ -52,9 +64,15 @@ const CategoryComponent = () => {
         } catch (error) {
           console.log(error);
           if (error.response && error.response.status === 409) {
-            setError(error.response.data);
+            handleNotificationChange({
+              message: error.response.data,
+              severity: "error",
+            });
           } else {
-            setError(error.message);
+            handleNotificationChange({
+              message: error.message,
+              severity: "error",
+            });
           }
         }
       };
@@ -64,15 +82,30 @@ const CategoryComponent = () => {
 
       setLoading(false);
     } catch (error) {
-      setError(error.message);
+      handleNotificationChange({
+        message: error.message,
+        severity: "error",
+      });
       setLoading(false);
     }
   }, []);
 
   const memoizedSaveCategoryButtonClickCallback = useCallback(
     async (editCategory) => {
+      const isValid = validateCategory(
+        editCategory.name,
+        editCategory.description
+      );
+
+      if (!isValid) {
+        handleNotificationChange({
+          message: validationError,
+          severity: "error",
+        });
+        return false; // Stop further execution
+      }
+
       try {
-        console.log(editCategory);
         const makeUpdateApiRequest = async () => {
           try {
             const abortController = new AbortController();
@@ -91,21 +124,40 @@ const CategoryComponent = () => {
               })
             );
           } catch (error) {
-            console.log(error);
             if (error.status === 409) {
-              setError(error.response?.data);
+              handleNotificationChange({
+                message: error.response?.data,
+                severity: "error",
+              });
             } else {
-              setError(error.message);
+              handleNotificationChange({
+                message: error.message,
+                severity: "error",
+              });
             }
           }
         };
         await makeUpdateApiRequest();
       } catch (error) {
-        setError(error.message);
+        handleNotificationChange({
+          message: error.message,
+          severity: "error",
+        });
       }
+
+      return true;
     },
-    []
+    [validationError]
   );
+
+  const handleNotificationChange = (newNotification) => {
+    setNotification(newNotification);
+    setIsSnackbarOpen(true);
+  };
+
+  const handleSnackbarClose = () => {
+    setIsSnackbarOpen(false);
+  };
 
   const handleFilterQueryChange = (event) => {
     setFilterQuery(event.target.value);
@@ -123,15 +175,21 @@ const CategoryComponent = () => {
 
   return (
     <div>
-      {error && <p>Error: {error}</p>}
+      <NotificationSnackbar
+        open={isSnackbarOpen}
+        onClose={handleSnackbarClose}
+        notification={notification}
+      />
       {loading && <p>Loading...</p>}
-      <h1>Categories List</h1>
       <SearchInput
         query={filterQuery}
         onQueryChange={handleFilterQueryChange}
       />
 
-      <AddCategoryForm setCategories={setCategories} setError={setError} />
+      <AddCategoryForm
+        setCategories={setCategories}
+        setNotification={handleNotificationChange}
+      />
 
       <CategoriesTable
         categories={filteredCategories}
