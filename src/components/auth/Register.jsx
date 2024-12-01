@@ -1,6 +1,8 @@
-import React from "react";
-import { useNavigate, useState } from "react-router-dom";
+import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { UserService } from "../../services/user.service";
+
+import { Button, Container, TextField } from "@mui/material";
 
 const Register = () => {
   const userInitial = {
@@ -9,18 +11,20 @@ const Register = () => {
     userName: "",
   };
 
-  const navigate = useNavigate(userInitial);
-  const [user, setUser] = useState();
+  const navigate = useNavigate();
+  const [user, setUser] = useState(userInitial);
 
   const handleUserChange = (event) => {
-    setUser({
-      ...user,
-      [event.target.name]: event.target.value,
-    });
+    const { name, value } = event.target;
+    setUser((prevUser) => ({
+      ...prevUser,
+      [name]: value,
+    }));
   };
 
   const handleSubmit = async (event) => {
     event.preventDefault();
+
     const response = await UserService.register(user);
 
     if (response) {
@@ -30,37 +34,35 @@ const Register = () => {
 
   return (
     <form onSubmit={handleSubmit}>
-      <label>
-        Email:
-        <input
+      <Container sx={{ display: "flex", flexDirection: "column", gap: "15px" }}>
+        <TextField
+          label="example@gmail.com"
+          variant="outlined"
           type="email"
+          name="email"
           value={user.email}
           onChange={handleUserChange}
-          name="email"
-          required
         />
-      </label>
-      <label>
-        User name:
-        <input
+        <TextField
+          label="exampleUserName"
+          variant="outlined"
           type="text"
+          name="userName"
           value={user.userName}
           onChange={handleUserChange}
-          name="userName"
-          required
         />
-      </label>
-      <label>
-        Password:
-        <input
+        <TextField
+          label="your password"
+          variant="outlined"
           type="password"
+          name="password"
           value={user.password}
           onChange={handleUserChange}
-          name="password"
-          required
         />
-      </label>
-      <button type="submit">Register</button>
+        <Button type="submit" variant="contained">
+          Register
+        </Button>
+      </Container>
     </form>
   );
 };
