@@ -1,18 +1,32 @@
-import React from "react";
+import React, { useState } from "react";
 import { jwtDecode } from "jwt-decode";
 import { UserService } from "../../services/user.service";
 import { useNavigate, useLocation } from "react-router-dom";
 
-//TODO: use states
+import { Button, Container, TextField } from "@mui/material";
+
 const Login = () => {
+  const userInitial = {
+    email: "",
+    password: "",
+  };
+
   const navigate = useNavigate();
+  const [user, setUser] = useState(userInitial);
   const location = useLocation();
+
+  const handleUserChange = (event) => {
+    const { name, value } = event.target;
+    setUser((prevUser) => ({
+      ...prevUser,
+      [name]: value,
+    }));
+  };
 
   const handleSubmit = async (event) => {
     event.preventDefault();
-    const email = event.target.email.value;
-    const password = event.target.password.value;
-    const response = await UserService.login(email, password);
+
+    const response = await UserService.login(user);
 
     if (response) {
       let decoded = jwtDecode(response);
@@ -28,15 +42,27 @@ const Login = () => {
 
   return (
     <form onSubmit={handleSubmit}>
-      <label>
-        Email:
-        <input type="email" name="email" required />
-      </label>
-      <label>
-        Password:
-        <input type="password" name="password" required />
-      </label>
-      <button type="submit">Login</button>
+      <Container sx={{ display: "flex", flexDirection: "column", gap: "15px" }}>
+        <TextField
+          label="Email"
+          variant="outlined"
+          name="email"
+          type="email"
+          value={user.email}
+          onChange={handleUserChange}
+        />
+        <TextField
+          label="Password"
+          variant="outlined"
+          name="password"
+          type="password"
+          value={user.password}
+          onChange={handleUserChange}
+        />
+        <Button type="submit" variant="contained">
+          Login
+        </Button>
+      </Container>
     </form>
   );
 };
