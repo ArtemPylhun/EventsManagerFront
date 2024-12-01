@@ -26,7 +26,7 @@ export class UserService {
       baseURL: `${apiUrl}/users`,
       signal,
     });
-    return await httpClient.post("/add", user);
+    return await httpClient.post("/register", { ...user });
   }
 
   static async updateUser(user, signal) {
@@ -46,4 +46,5 @@ export class UserService {
     });
     return await httpClient.delete(`/delete/${id}`);
   }
+
 }

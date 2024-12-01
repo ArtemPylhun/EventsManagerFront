@@ -8,6 +8,7 @@ import NotFoundPage from "../components/NotFoundPage";
 import CategoryComponent from "../components/categories/CategoryComponent";
 import TagComponent from "../components/tags/TagComponent";
 import UserComponent from "../components/users/UserComponent";
+import ProtectedRoute from "./ProtectedRoute";
 
 const Router = () => {
   return (
@@ -18,15 +19,42 @@ const Router = () => {
       }}
     >
       <Routes>
+        <Route path="*" element={<NotFoundPage />} />
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
         <Route path="/" element={<Layout />}>
           <Route index element={<EventsList />} />
+          <Route
+            path="/users"
+            element={
+              <ProtectedRoute allowedRoles={["Admin"]}>
+                <UserComponent />
+              </ProtectedRoute>
+          }
+            element={
+              <ProtectedRoute allowedRoles={["Admin"]}>
+                <CategoryComponent />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/categories"
+            element={
+              <ProtectedRoute allowedRoles={["Admin"]}>
+                <CategoryComponent />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/tags"
+            element={
+              <ProtectedRoute allowedRoles={["Admin"]}>
+                <TagComponent />
+              </ProtectedRoute>
+            }
+          />
         </Route>
         <Route path="*" element={<NotFoundPage />} />
-        <Route path="/categories" element={<CategoryComponent />} />
-        <Route path="/tags" element={<TagComponent />} />
-        <Route path="/users" element={<UserComponent />} />
       </Routes>
     </BrowserRouter>
   );
