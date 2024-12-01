@@ -1,5 +1,5 @@
 import React from "react";
-import { useNavigate, useState } from "react-router-dom";
+import { useNavigate, useState } from "react";
 import { UserService } from "../../services/user.service";
 
 const Register = () => {
@@ -10,17 +10,28 @@ const Register = () => {
   };
 
   const navigate = useNavigate(userInitial);
-  const [user, setUser] = useState();
+  const [user, setUser] = useState(userInitial);
+  const [errors, setErrors] = useState({});
 
   const handleUserChange = (event) => {
     setUser({
       ...user,
       [event.target.name]: event.target.value,
     });
+    setErrors({});
   };
 
   const handleSubmit = async (event) => {
     event.preventDefault();
+
+    if (!user.password.match(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{8,}$/)) {
+      setErrors({
+        password:
+          "Password must be at least 8 characters long, include an uppercase letter, a number, and a special character",
+      });
+      return;
+    }
+
     const response = await UserService.register(user);
 
     if (response) {
@@ -60,6 +71,7 @@ const Register = () => {
           required
         />
       </label>
+      {errors.password && <p style={{ color: "darkred" }}>{errors.password}</p>}
       <button type="submit">Register</button>
     </form>
   );
