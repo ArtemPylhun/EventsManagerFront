@@ -1,61 +1,42 @@
 import React, { useState } from "react";
 
 export const useValidateCategory = () => {
-  const errorsInitial = {
-    name: "",
-    description: "",
-  };
-
-  const [validationErrors, setValidationErrors] = useState(errorsInitial);
+  const [validationError, setValidationError] = useState(null);
 
   const validateCategory = (name, description) => {
-    if (
-      name.trim().length < 3 ||
-      name.trim().length > 255 ||
-      description.trim().length < 5 ||
-      description.trim().length > 1000
-    ) {
-      if (name.trim().length < 3) {
-        setValidationErrors((prev) => {
-          return {
-            ...prev,
-            name: "The category name must be at least 3 letters long",
-          };
-        });
-      }
-      if (name.trim().length > 255) {
-        setValidationErrors((prev) => {
-          return {
-            ...prev,
-            name: "The category name must be less then 255 letters long",
-          };
-        });
-      }
-      if (description.trim().length < 5) {
-        setValidationErrors((prev) => {
-          return {
-            ...prev,
-            description:
-              "The category description must be at least 5 letters long",
-          };
-        });
-      }
-      if (description.trim().length > 1000) {
-        setValidationErrors((prev) => {
-          return {
-            ...prev,
-            description:
-              "The category description must be less then 1000 letters long",
-          };
-        });
-      }
+    // Validate name
+    if (name.trim().length < 3) {
+      setValidationError("The category name must be at least 3 letters long");
       return false;
     }
+    if (name.trim().length > 255) {
+      setValidationError(
+        "The category name must be less than 255 letters long"
+      );
+      return false;
+    }
+
+    // Validate description
+    if (description.trim().length < 5) {
+      setValidationError(
+        "The category description must be at least 5 letters long"
+      );
+      return false;
+    }
+    if (description.trim().length > 1000) {
+      setValidationError(
+        "The category description must be less than 1000 letters long"
+      );
+      return false;
+    }
+
+    // No errors, reset error state
+    setValidationError(null);
     return true;
   };
 
   return {
-    validationErrors,
+    validationError,
     validateCategory,
   };
 };

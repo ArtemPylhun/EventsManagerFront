@@ -1,135 +1,50 @@
-import { memo, useCallback, useMemo, useState } from "react";
-import { useValidateCategory } from "../../hooks/categories/useValidateCategory";
+import React, { useState } from "react";
+import { TableRow, TableCell, Button, Box } from "@mui/material";
+import EditCategoryModal from "./EditCategoryModal";
 
-const CategoryTableRowComponent = ({
-  category,
-  onCategoryDelete,
-  onSaveCategoryButtonClick,
-}) => {
-  const { validationErrors, validateCategory } = useValidateCategory();
+const CategoryTableRow = ({ category, onCategoryDelete, onCategoryUpdate }) => {
+  const [isEditModalOpen, setEditModalOpen] = useState(false);
 
-  const memoizedCategoryNameValue = useMemo(
-    () => category.name,
-    [category.name]
-  );
-  const memoizedCategoryDescriptionValue = useMemo(
-    () => category.description,
-    [category.description]
-  );
+  const handleSave = (updatedCategory) => {
+    onCategoryUpdate(updatedCategory);
+  };
 
-  const [categoryName, setCategoryName] = useState(memoizedCategoryNameValue);
-  const [categoryDescription, setCategoryDescription] = useState(
-    memoizedCategoryDescriptionValue
-  );
+  const openModal = () => {
+    setEditModalOpen(true);
+  };
 
-  const [isEditMode, setIsEditMode] = useState(false);
+  const closeModal = () => {
+    setEditModalOpen(false);
+  };
 
-  const memoizedSetCategoryNameCallback = useCallback((event) => {
-    setCategoryName(event.target.value);
-  }, []);
-
-  const memoizedSetCategoryDescriptionCallback = useCallback((event) => {
-    setCategoryDescription(event.target.value);
-  }, []);
-
-  const memoizedSetIsEditModeCallback = useCallback(
-    (isEdit) => {
-      setIsEditMode(isEdit);
-      if (!isEdit) {
-        setCategoryName(memoizedCategoryNameValue);
-        setCategoryDescription(memoizedCategoryDescriptionValue);
-      }
-    },
-    [memoizedCategoryNameValue, memoizedCategoryDescriptionValue]
-  );
-
-  const memoizedSaveCategoryButtonClickCallback = useCallback(() => {
-    if (validateCategory(categoryName, categoryDescription)) {
-      onSaveCategoryButtonClick({
-        id: category.id,
-        name: categoryName,
-        description: categoryDescription,
-      });
-      setIsEditMode(false);
-    }
-  }, [
-    onSaveCategoryButtonClick,
-    category.id,
-    categoryName,
-    categoryDescription,
-  ]);
-
-  const memoizedCategoryDeleteCallback = useCallback(() => {
+  const handleDelete = () => {
     onCategoryDelete(category.id);
-  }, [onCategoryDelete, category.id]);
+  };
 
   return (
-    <tr key={category.id}>
-      <td>
-        {isEditMode ? (
-          <div>
-            <input
-              name="name"
-              value={categoryName}
-              onChange={memoizedSetCategoryNameCallback}
-            />
-            {validationErrors.name && (
-              <p style={{ color: "darkred", margin: "0" }}>
-                {validationErrors.name}
-              </p>
-            )}
-          </div>
-        ) : (
-          category.name
-        )}
-      </td>
-      <td>
-        {isEditMode ? (
-          <div>
-            <input
-              name="description"
-              value={categoryDescription}
-              onChange={memoizedSetCategoryDescriptionCallback}
-            />
-            {validationErrors.description && (
-              <p style={{ color: "darkred", margin: "0" }}>
-                {validationErrors.description}
-              </p>
-            )}
-          </div>
-        ) : (
-          category.description
-        )}
-      </td>
-      <td>
-        <div
-          style={{
-            display: "flex",
-            gap: "1em",
-          }}
-        >
-          {isEditMode ? (
-            <button onClick={() => memoizedSaveCategoryButtonClickCallback()}>
-              Save
-            </button>
-          ) : (
-            <button onClick={() => memoizedSetIsEditModeCallback(true)}>
+    <>
+      <TableRow>
+        <TableCell align="center">{category.name}</TableCell>
+        <TableCell align="center">{category.description}</TableCell>
+        <TableCell align="center">
+          <Box display="flex" gap={1} justifyContent="center">
+            <Button onClick={openModal} variant="outlined" color="primary">
               Edit
-            </button>
-          )}
-          {isEditMode ? (
-            <button onClick={() => memoizedSetIsEditModeCallback(false)}>
-              Cancel
-            </button>
-          ) : (
-            <button onClick={memoizedCategoryDeleteCallback}>Delete</button>
-          )}
-        </div>
-      </td>
-    </tr>
+            </Button>
+            <Button onClick={handleDelete} variant="contained" color="error">
+              Delete
+            </Button>
+          </Box>
+        </TableCell>
+      </TableRow>
+      <EditCategoryModal
+        open={isEditModalOpen}
+        onClose={closeModal}
+        category={category}
+        onSave={handleSave}
+      />
+    </>
   );
 };
-
-const CategoryTableRow = memo(CategoryTableRowComponent);
 
 export default CategoryTableRow;
