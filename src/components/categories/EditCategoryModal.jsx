@@ -10,8 +10,8 @@ const EditCategoryModal = ({ open, onClose, category, onSave }) => {
     setDescription(category.description);
   }, [open, category]);
 
-  const handleSave = () => {
-    const success = onSave({ ...category, name, description });
+  const handleSave = async () => {
+    const success = await onSave({ ...category, name, description });
     if (success) {
       onClose();
     }

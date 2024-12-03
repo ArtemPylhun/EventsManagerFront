@@ -1,7 +1,7 @@
-import React, { useState } from "react";
+import { useState } from "react";
 
 export const useValidateCategory = () => {
-  const [validationError, setValidationError] = useState(null);
+  const [validationError, setValidationError] = useState("");
 
   const validateCategory = (name, description) => {
     // Validate name
@@ -30,8 +30,7 @@ export const useValidateCategory = () => {
       return false;
     }
 
-    // No errors, reset error state
-    setValidationError(null);
+    setValidationError("");
     return true;
   };
 
