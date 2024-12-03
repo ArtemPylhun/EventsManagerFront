@@ -1,15 +1,17 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import { CategoryService } from "../../services/category.service";
 import { useValidateCategory } from "../../hooks/categories/useValidateCategory";
 import { Button, TextField, Container } from "@mui/material";
+import { useNotifications } from "../../contexts/notifications/useNotifications";
 
-const AddCategoryForm = ({ setCategories, setNotification }) => {
+const AddCategoryForm = ({ setCategories }) => {
   const categoryInitial = {
     name: "",
     description: "",
   };
   const [newCategory, setNewCategory] = useState(categoryInitial);
   const { validationError, validateCategory } = useValidateCategory();
+  const { showNotification } = useNotifications();
 
   const onCategoryChange = (event) => {
     const { name, value } = event.target;
@@ -17,13 +19,15 @@ const AddCategoryForm = ({ setCategories, setNotification }) => {
       ...prevCategory,
       [name]: value,
     }));
-    console.log(`${name}: ${value}`);
   };
 
   const onSubmit = (event) => {
     event.preventDefault();
     if (!validateCategory(newCategory.name, newCategory.description)) {
-      setNotification({ message: validationError, severity: "error" });
+      showNotification(validationError, {
+        severity: "error",
+        autoHideDuration: 5000,
+      });
       return;
     }
     const makeCreateApiRequest = async () => {
@@ -34,23 +38,23 @@ const AddCategoryForm = ({ setCategories, setNotification }) => {
           newCategory,
           signal
         );
-        setNotification({
-          message: "Category created successfully",
+        showNotification("Category created successfully", {
           severity: "success",
+          autoHideDuration: 5000,
         });
         setCategories((prev) => [...prev, { ...newCategory, id: response.id }]);
         setNewCategory(categoryInitial);
       } catch (error) {
         console.log(error);
         if (error.response && error.response.status === 409) {
-          setNotification({
-            message: error.response.data,
+          showNotification(error.response.data, {
             severity: "error",
+            autoHideDuration: 5000,
           });
         } else {
-          setNotification({
-            message: error.message,
+          showNotification(error.message, {
             severity: "error",
+            autoHideDuration: 5000,
           });
         }
       }

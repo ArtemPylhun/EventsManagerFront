@@ -3,22 +3,17 @@ import { CategoryService } from "../../services/category.service";
 import CategoriesTable from "./CategoriesTable";
 import SearchInput from "../SearchInput";
 import AddCategoryForm from "./AddCategoryForm";
-import NotificationSnackbar from "../NotificationSnackbar";
 import { useValidateCategory } from "../../hooks/categories/useValidateCategory";
+import { useNotifications } from "../../contexts/notifications/useNotifications";
 
 const CategoryComponent = () => {
-  const notificationInitial = {
-    message: "",
-    severity: "",
-  };
-
   const [categories, setCategories] = useState([]);
   const [loading, setLoading] = useState(false);
-  const [notification, setNotification] = useState(notificationInitial);
   const [filterQuery, setFilterQuery] = useState("");
-  const [isSnackbarOpen, setIsSnackbarOpen] = useState(false);
 
   const { validateCategory, validationError } = useValidateCategory();
+
+  const { showNotification } = useNotifications();
 
   useEffect(() => {
     let isMounted = true;
@@ -27,7 +22,6 @@ const CategoryComponent = () => {
     const fetchCategories = async () => {
       try {
         setLoading(true);
-        setNotification(notificationInitial);
 
         const response = await CategoryService.getAllCategories(
           abortController.signal
@@ -36,9 +30,9 @@ const CategoryComponent = () => {
           setCategories(response);
         }
       } catch (error) {
-        handleNotificationChange({
-          message: error.message,
+        showNotification(error.message, {
           severity: "error",
+          autoHideDuration: 5000,
         });
       } finally {
         setLoading(false);
@@ -61,17 +55,21 @@ const CategoryComponent = () => {
         try {
           await CategoryService.deleteCategoryById(id, signal);
           setCategories((prev) => prev.filter((el) => el.id !== id));
+          showNotification("Category deleted successfully", {
+            severity: "success",
+            autoHideDuration: 5000,
+          });
         } catch (error) {
           console.log(error);
           if (error.response && error.response.status === 409) {
-            handleNotificationChange({
-              message: error.response.data,
+            showNotification(error.response.data, {
               severity: "error",
+              autoHideDuration: 5000,
             });
           } else {
-            handleNotificationChange({
-              message: error.message,
+            showNotification(error.message, {
               severity: "error",
+              autoHideDuration: 5000,
             });
           }
         }
@@ -82,9 +80,9 @@ const CategoryComponent = () => {
 
       setLoading(false);
     } catch (error) {
-      handleNotificationChange({
-        message: error.message,
+      showNotification(error.message, {
         severity: "error",
+        autoHideDuration: 5000,
       });
       setLoading(false);
     }
@@ -98,11 +96,11 @@ const CategoryComponent = () => {
       );
 
       if (!isValid) {
-        handleNotificationChange({
-          message: validationError,
+        showNotification(validationError, {
           severity: "error",
+          autoHideDuration: 5000,
         });
-        return false; // Stop further execution
+        return false;
       }
 
       try {
@@ -123,25 +121,30 @@ const CategoryComponent = () => {
                 return el;
               })
             );
+
+            showNotification("Category updated successfully", {
+              severity: "success",
+              autoHideDuration: 5000,
+            });
           } catch (error) {
             if (error.status === 409) {
-              handleNotificationChange({
-                message: error.response?.data,
+              showNotification(error.response?.data, {
                 severity: "error",
+                autoHideDuration: 5000,
               });
             } else {
-              handleNotificationChange({
-                message: error.message,
+              showNotification(error.message, {
                 severity: "error",
+                autoHideDuration: 5000,
               });
             }
           }
         };
         await makeUpdateApiRequest();
       } catch (error) {
-        handleNotificationChange({
-          message: error.message,
+        showNotification(error.message, {
           severity: "error",
+          autoHideDuration: 5000,
         });
       }
 
@@ -149,15 +152,6 @@ const CategoryComponent = () => {
     },
     [validationError]
   );
-
-  const handleNotificationChange = (newNotification) => {
-    setNotification(newNotification);
-    setIsSnackbarOpen(true);
-  };
-
-  const handleSnackbarClose = () => {
-    setIsSnackbarOpen(false);
-  };
 
   const handleFilterQueryChange = (event) => {
     setFilterQuery(event.target.value);
@@ -175,21 +169,13 @@ const CategoryComponent = () => {
 
   return (
     <div>
-      <NotificationSnackbar
-        open={isSnackbarOpen}
-        onClose={handleSnackbarClose}
-        notification={notification}
-      />
       {loading && <p>Loading...</p>}
       <SearchInput
         query={filterQuery}
         onQueryChange={handleFilterQueryChange}
       />
 
-      <AddCategoryForm
-        setCategories={setCategories}
-        setNotification={handleNotificationChange}
-      />
+      <AddCategoryForm setCategories={setCategories} />
 
       <CategoriesTable
         categories={filteredCategories}

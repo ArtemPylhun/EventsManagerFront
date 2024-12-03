@@ -5,10 +5,6 @@ import EditCategoryModal from "./EditCategoryModal";
 const CategoryTableRow = ({ category, onCategoryDelete, onCategoryUpdate }) => {
   const [isEditModalOpen, setEditModalOpen] = useState(false);
 
-  const handleSave = (updatedCategory) => {
-    onCategoryUpdate(updatedCategory);
-  };
-
   const openModal = () => {
     setEditModalOpen(true);
   };
@@ -17,6 +13,12 @@ const CategoryTableRow = ({ category, onCategoryDelete, onCategoryUpdate }) => {
     setEditModalOpen(false);
   };
 
+  const handleSave = async (updatedCategory) => {
+    const success = await onCategoryUpdate(updatedCategory);
+    if (success) {
+      closeModal();
+    }
+  };
   const handleDelete = () => {
     onCategoryDelete(category.id);
   };
