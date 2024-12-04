@@ -1,10 +1,10 @@
 import React, { useEffect, useState, useCallback } from "react";
 import { CategoryService } from "../../services/category.service";
 import CategoriesTable from "./CategoriesTable";
-import SearchInput from "../SearchInput";
-import AddCategoryForm from "./AddCategoryForm";
-import { useValidateCategory } from "../../hooks/categories/useValidateCategory";
-import { useNotifications } from "../../contexts/notifications/useNotifications";
+import SearchInput from "../../../../components/common/SearchInput";
+import AddCategoryForm from "../AddCategoryForm";
+import { useValidateCategory } from "../../hooks/useValidateCategory";
+import { useNotifications } from "../../../../contexts/notifications/useNotifications";
 
 const CategoryComponent = () => {
   const [categories, setCategories] = useState([]);

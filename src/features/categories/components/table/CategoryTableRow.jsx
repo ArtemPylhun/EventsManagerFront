@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { TableRow, TableCell, Button, Box } from "@mui/material";
-import EditCategoryModal from "./EditCategoryModal";
+import EditCategoryModal from "../EditCategoryModal";
 
 const CategoryTableRow = ({ category, onCategoryDelete, onCategoryUpdate }) => {
   const [isEditModalOpen, setEditModalOpen] = useState(false);

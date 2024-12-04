@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { jwtDecode } from "jwt-decode";
-import { UserService } from "../../services/user.service";
+import { UserService } from "../users/services/user.service";
 import { useNavigate, useLocation } from "react-router-dom";
 
 import { Button, Container, TextField } from "@mui/material";

@@ -1,5 +1,5 @@
 import React, { createContext, useState, useCallback, useMemo } from "react";
-import NotificationsSnackbar from "../../components/NotificationsSnackbar";
+import NotificationsSnackbar from "../../components/common/NotificationsSnackbar";
 
 export const NotificationsContext = createContext();
 
