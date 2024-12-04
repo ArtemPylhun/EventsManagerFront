@@ -1,89 +1,50 @@
-import { memo, useCallback, useMemo, useState } from "react";
-import { useValidateTag } from "../../hooks/useValidateTag";
+import React, { useState } from "react";
+import { TableRow, TableCell, Button, Box } from "@mui/material";
+import EditTagModal from "../EditTagModal";
 
-const TagTableRowComponent = ({ tag, onTagDelete, onSaveTagButtonClick }) => {
-  const { tagValidationErrors, validateTag } = useValidateTag();
-  const memoizedTagTitleValue = useMemo(() => tag.title, [tag.title]);
+const TagTableRow = ({ tag, onTagDelete, onTagUpdate }) => {
+  const [isEditModalOpen, setEditModalOpen] = useState(false);
+  const openModal = () => {
+    setEditModalOpen(true);
+  };
 
-  const [tagTitle, setTagTitle] = useState(memoizedTagTitleValue);
+  const closeModal = () => {
+    setEditModalOpen(false);
+  };
 
-  const [isEditMode, setIsEditMode] = useState(false);
-
-  const memoizedSetTagTitleCallback = useCallback((event) => {
-    setTagTitle(event.target.value);
-  }, []);
-
-  const memoizedSetIsEditModeCallback = useCallback(
-    (isEdit) => {
-      setIsEditMode(isEdit);
-      if (!isEdit) {
-        setTagTitle(memoizedTagTitleValue);
-      }
-    },
-    [memoizedTagTitleValue]
-  );
-
-  const memoizedSaveTagButtonClickCallback = useCallback(() => {
-    if (validateTag(tagTitle)) {
-      onSaveTagButtonClick({
-        id: tag.id,
-        title: tagTitle,
-      });
-      setIsEditMode(false);
+  const handleSave = async (updatedTag) => {
+    const success = await onTagUpdate(updatedTag);
+    if (success) {
+      closeModal();
     }
-  }, [onSaveTagButtonClick, tag.id, tagTitle]);
-
-  const memoizedTagDeleteCallback = useCallback(() => {
+  };
+  const handleDelete = () => {
     onTagDelete(tag.id);
-  }, [onTagDelete, tag.id]);
+  };
 
   return (
-    <tr key={tag.id}>
-      <td>
-        {isEditMode ? (
-          <div>
-            <input
-              name="title"
-              value={tagTitle}
-              onChange={memoizedSetTagTitleCallback}
-            />
-            {tagValidationErrors.title && (
-              <p style={{ color: "darkred", margin: "0" }}>
-                {tagValidationErrors.title}
-              </p>
-            )}
-          </div>
-        ) : (
-          tag.title
-        )}
-      </td>
-      <td>
-        <div
-          style={{
-            display: "flex",
-            gap: "1em",
-          }}
-        >
-          {isEditMode ? (
-            <button onClick={memoizedSaveTagButtonClickCallback}>Save</button>
-          ) : (
-            <button onClick={() => memoizedSetIsEditModeCallback(true)}>
+    <>
+      <TableRow key={tag.id}>
+        <TableCell align="center">{tag.title}</TableCell>
+        <TableCell align="center">
+          <Box display="flex" gap={1} justifyContent="center">
+            <Button onClick={openModal} variant="outlined" color="primary">
               Edit
-            </button>
-          )}
-          {isEditMode ? (
-            <button onClick={() => memoizedSetIsEditModeCallback(false)}>
-              Cancel
-            </button>
-          ) : (
-            <button onClick={memoizedTagDeleteCallback}>Delete</button>
-          )}
-        </div>
-      </td>
-    </tr>
+            </Button>
+            <Button onClick={handleDelete} variant="contained" color="error">
+              Delete
+            </Button>
+          </Box>
+        </TableCell>
+      </TableRow>
+      <EditTagModal
+        open={isEditModalOpen}
+        onClose={closeModal}
+        tag={tag}
+        onSave={handleSave}
+      />
+    </>
   );
 };
-
-const TagTableRow = memo(TagTableRowComponent);
 
 export default TagTableRow;

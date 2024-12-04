@@ -1,54 +1,85 @@
 import React, { useState } from "react";
 import { TagService } from "../services/tag.service";
 import { useValidateTag } from "../hooks/useValidateTag";
-const AddTagForm = ({ setTags, setError }) => {
+import { Button, TextField, Container } from "@mui/material";
+import { useNotifications } from "../../../contexts/notifications/useNotifications";
+
+const AddTagForm = ({ setTags }) => {
   const tagInitial = {
     title: "",
   };
 
   const [newTag, setNewTag] = useState(tagInitial);
-  let { tagValidationErrors, validateTag } = useValidateTag();
+  let { validationError, validateTag } = useValidateTag();
+  const { showNotification } = useNotifications();
+
   const onTagChange = (event) => {
-    setNewTag({
-      ...newTag,
-      [event.target.name]: event.target.value,
-    });
+    const { name, value } = event.target;
+    setNewTag((prevTag) => ({
+      ...prevTag,
+      [name]: value,
+    }));
   };
 
-  const onSubmit = (event) => {
+  const onSubmit = async (event) => {
     event.preventDefault();
-
-    if (validateTag(newTag.title)) {
-      const makeCreateApiRequest = async () => {
-        try {
-          const abortController = new AbortController();
-          const signal = abortController.signal;
-          const response = await TagService.createTag(newTag, signal);
-          setTags((prev) => [...prev, { ...newTag, id: response.id }]);
-          setNewTag(tagInitial);
-        } catch (error) {
-          console.log(error);
-          if (error.response && error.response.status === 409) {
-            setError(error.response.data);
-          } else {
-            setError(error.message);
-          }
-        }
-      };
-
-      makeCreateApiRequest();
+    if (!validateTag(newTag.title)) {
+      showNotification(validationError, {
+        severity: "error",
+        autoHideDuration: 5000,
+      });
+      return;
     }
+    const makeCreateApiRequest = async () => {
+      try {
+        const abortController = new AbortController();
+        const signal = abortController.signal;
+        const response = await TagService.createTag(newTag, signal);
+        showNotification("Tag created successfully", {
+          severity: "success",
+          autoHideDuration: 5000,
+        });
+        setTags((prev) => [...prev, { ...newTag, id: response.id }]);
+        setNewTag(tagInitial);
+      } catch (error) {
+        if (error.response && error.response.status === 409) {
+          showNotification(error.response.data, {
+            severity: "error",
+            autoHideDuration: 5000,
+          });
+        } else {
+          showNotification(error.message, {
+            severity: "error",
+            autoHideDuration: 5000,
+          });
+        }
+      }
+    };
+
+    await makeCreateApiRequest();
   };
 
   return (
     <form onSubmit={onSubmit}>
-      <input value={newTag.title} name="title" onChange={onTagChange} />
-      {tagValidationErrors.title && (
-        <p style={{ color: "darkred" }}>{tagValidationErrors.title}</p>
-      )}
-      <button style={{ margin: "0px 10px" }} type="submit">
-        Add
-      </button>
+      <Container
+        sx={{
+          display: "flex",
+          flexDirection: "row",
+          gap: "10px",
+          justifyContent: "space-between",
+        }}
+      >
+        <TextField
+          value={newTag.title}
+          name="title"
+          label="Title"
+          onChange={onTagChange}
+          variant="outlined"
+        />
+        <Button type="submit" variant="contained">
+          Add
+        </Button>
+      </Container>
     </form>
   );
 };
