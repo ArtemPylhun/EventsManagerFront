@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { UserService } from "../../services/user.service";
+import { UserService } from "../users/services/user.service";
 
 import { Button, Container, TextField } from "@mui/material";
 

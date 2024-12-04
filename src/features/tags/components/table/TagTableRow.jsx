@@ -1,5 +1,5 @@
 import { memo, useCallback, useMemo, useState } from "react";
-import { useValidateTag } from "../../hooks/tags/useValidateTag";
+import { useValidateTag } from "../../hooks/useValidateTag";
 
 const TagTableRowComponent = ({ tag, onTagDelete, onSaveTagButtonClick }) => {
   const { tagValidationErrors, validateTag } = useValidateTag();

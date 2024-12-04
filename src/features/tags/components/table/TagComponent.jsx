@@ -1,9 +1,9 @@
 import { useEffect, useState, useCallback } from "react";
 import React from "react";
 import { TagService } from "../../services/tag.service";
-import TagsTable from "./TagsTable";
-import SearchInput from "../SearchInput";
-import AddTagForm from "./AddTagForm";
+import TagsTable from "../../../tags/components/table/TagsTable";
+import SearchInput from "../../../../components/common/SearchInput";
+import AddTagForm from "../AddTagForm";
 
 const TagComponent = () => {
   const [tags, setTags] = useState([]);
@@ -117,7 +117,6 @@ const TagComponent = () => {
     <div>
       {error && <p>Error: {error}</p>}
       {loading && <p>Loading...</p>}
-      <h1>Tags List</h1>
       <SearchInput
         query={filterQuery}
         onQueryChange={handleFilterQueryChange}

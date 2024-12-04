@@ -1,4 +1,4 @@
-import { HttpClient } from "../utils/http/HttpClient";
+import { HttpClient } from "../../../utils/http/HttpClient";
 
 export class CategoryService {
   /**

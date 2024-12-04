@@ -1,6 +1,6 @@
 import React, { useState } from "react";
-import { TagService } from "../../services/tag.service";
-import { useValidateTag } from "../../hooks/tags/useValidateTag";
+import { TagService } from "../services/tag.service";
+import { useValidateTag } from "../hooks/useValidateTag";
 const AddTagForm = ({ setTags, setError }) => {
   const tagInitial = {
     title: "",

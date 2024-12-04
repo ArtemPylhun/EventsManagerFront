@@ -1,8 +1,8 @@
 import { useState } from "react";
-import { CategoryService } from "../../services/category.service";
-import { useValidateCategory } from "../../hooks/categories/useValidateCategory";
+import { CategoryService } from "../services/category.service";
+import { useValidateCategory } from "../hooks/useValidateCategory";
 import { Button, TextField, Container } from "@mui/material";
-import { useNotifications } from "../../contexts/notifications/useNotifications";
+import { useNotifications } from "../../../contexts/notifications/useNotifications";
 
 const AddCategoryForm = ({ setCategories }) => {
   const categoryInitial = {
