@@ -45,7 +45,6 @@ const AddCategoryForm = ({ setCategories }) => {
         setCategories((prev) => [...prev, { ...newCategory, id: response.id }]);
         setNewCategory(categoryInitial);
       } catch (error) {
-        console.log(error);
         if (error.response && error.response.status === 409) {
           showNotification(error.response.data, {
             severity: "error",
