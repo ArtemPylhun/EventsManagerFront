@@ -1,7 +1,7 @@
 import React from "react";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 
-import UserComponent from "../components/users/UserComponent";
+import UserPage from "../features/users/UserPage";
 import Layout from "../components/layout/Layout";
 import Register from "../features/auth/Register";
 import Login from "../features/auth/Login";
@@ -27,7 +27,7 @@ const Router = () => {
             path="/users"
             element={
               <ProtectedRoute allowedRoles={["Admin"]}>
-                <UserComponent />
+                <UserPage />
               </ProtectedRoute>
             }
           />
