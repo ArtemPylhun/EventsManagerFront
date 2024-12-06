@@ -1,3 +1,4 @@
+
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { UserService } from "../users/services/user.service";
@@ -10,6 +11,7 @@ const Register = () => {
     password: "",
     userName: "",
   };
+
 
   const navigate = useNavigate();
   const [user, setUser] = useState(userInitial);
@@ -24,6 +26,15 @@ const Register = () => {
 
   const handleSubmit = async (event) => {
     event.preventDefault();
+
+    if (!user.password.match(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{8,}$/)) {
+      setErrors({
+        password:
+          "Password must be at least 8 characters long, include an uppercase letter, a number, and a special character",
+      });
+      return;
+    }
+
 
     const response = await UserService.register(user);
 
@@ -59,6 +70,7 @@ const Register = () => {
           value={user.password}
           onChange={handleUserChange}
         />
+
         <Button type="submit" variant="contained">
           Register
         </Button>
