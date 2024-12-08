@@ -1,27 +1,17 @@
-import { useState } from "react";
-
 export const useUpdateValidateUser = () => {
-  const [validationUpdateError, setValidationUpdateError] = useState("");
-
   const validateUpdateUser = (request) => {
-    console.log("Validation request ", request);
     if (request.userName.trim().length < 3) {
-      setValidationUpdateError("The user name must be at least 3 letters long");
-      return false;
+      return "The user name must be at least 3 letters long";
     }
     if (request.userName.trim().length > 255) {
-      setValidationUpdateError(
-        "The user name must be less then 255 letters long"
-      );
-      return false;
+      return "The user name must be less then 255 letters long";
     }
 
     if (
       request.profile.fullName &&
       request.profile.fullName.trim().length === 0
     ) {
-      setValidationUpdateError("The full name is required");
-      return false;
+      return "The full name is required";
     }
 
     const strongPhoneNumberRegex =
@@ -31,17 +21,13 @@ export const useUpdateValidateUser = () => {
       request.profile.phoneNumber &&
       !strongPhoneNumberRegex.test(request.profile.phoneNumber)
     ) {
-      setValidationUpdateError(
-        "The phone number must be valid (e.g. +1 123-456-7890)"
-      );
-      return false;
+      return "The phone number must be valid (e.g. +1 123-456-7890)";
     }
     if (
       request.profile.address &&
       request.profile.address.trim().length === 0
     ) {
-      setValidationUpdateError("The address is required");
-      return false;
+      return "The address is required";
     }
 
     const dateRegex = /^\d{2}\.\d{2}\.\d{4}$/;
@@ -69,17 +55,13 @@ export const useUpdateValidateUser = () => {
 
     // Validation check
     if (request.profile.birthDate && !isValidDate(request.profile.birthDate)) {
-      setValidationUpdateError(
-        "The birth date must be valid and in the format DD.MM.YYYY"
-      );
-      return false;
+      return "The birth date must be valid and in the format DD.MM.YYYY";
     }
 
-    return true;
+    return "";
   };
 
   return {
-    validationUpdateError,
     validateUpdateUser,
   };
 };

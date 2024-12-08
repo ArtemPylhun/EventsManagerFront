@@ -1,22 +1,18 @@
-import React, { useState } from "react";
+import React from "react";
 import { TableRow, TableCell, Button, Box } from "@mui/material";
-import EditUserModal from "../EditUserModal";
+import { useUserDialogContext } from "../../../../contexts/userDialogContext/useUserDialogContext";
+import UserModal from "../UserModal";
 
 const UserTableRow = ({ user, onUserDelete, onUserUpdate }) => {
-  const [isEditModalOpen, setEditModalOpen] = useState(false);
-  const openModal = () => {
-    setEditModalOpen(true);
-  };
-
-  const closeModal = () => {
-    setEditModalOpen(false);
-  };
-
-  const handleSave = async (updatedUser) => {
-    const success = await onUserUpdate(updatedUser);
-    if (success) {
-      closeModal();
-    }
+  const { openDialog, isOpen, userId } = useUserDialogContext();
+  const openEditModal = () => {
+    openDialog(user.id, [
+      "userName",
+      "profile.fullName",
+      "profile.phoneNumber",
+      "profile.address",
+      "profile.birthDate",
+    ]);
   };
   const handleDelete = () => {
     onUserDelete(user.id);
@@ -33,7 +29,7 @@ const UserTableRow = ({ user, onUserDelete, onUserUpdate }) => {
         </TableCell>
         <TableCell align="center">
           <Box display="flex" gap={1} justifyContent="center">
-            <Button onClick={openModal} variant="outlined" color="primary">
+            <Button onClick={openEditModal} variant="outlined" color="primary">
               Edit
             </Button>
             <Button onClick={handleDelete} variant="contained" color="error">
@@ -42,12 +38,9 @@ const UserTableRow = ({ user, onUserDelete, onUserUpdate }) => {
           </Box>
         </TableCell>
       </TableRow>
-      <EditUserModal
-        open={isEditModalOpen}
-        onClose={closeModal}
-        user={user}
-        onSave={handleSave}
-      />
+      {isOpen && user.id === userId && (
+        <UserModal user={user} setUsers={onUserUpdate} editMode />
+      )}
     </>
   );
 };
