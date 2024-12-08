@@ -26,7 +26,7 @@ const Login = () => {
   const handleSubmit = async (event) => {
     event.preventDefault();
 
-    const response = await UserService.login(user);
+    const response = await UserService.loginUser(user);
 
     if (response) {
       let decoded = jwtDecode(response);

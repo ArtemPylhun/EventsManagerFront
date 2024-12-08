@@ -11,7 +11,7 @@ export class UserService {
     return await httpClient.get("");
   }
 
-  static async loginUser(email, password, signal) {
+  static async loginUser(user, signal) {
     const apiUrl = import.meta.env.VITE_API_BASE_URL;
     const httpClient = new HttpClient({
       baseURL: `${apiUrl}/users`,
@@ -30,6 +30,7 @@ export class UserService {
   }
 
   static async updateUser(user, signal) {
+    console.warn("user", user);
     const apiUrl = import.meta.env.VITE_API_BASE_URL;
     const httpClient = new HttpClient({
       baseURL: `${apiUrl}/users`,

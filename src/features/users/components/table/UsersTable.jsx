@@ -9,7 +9,7 @@ import {
   Paper,
 } from "@mui/material";
 import UserTableRow from "./UserTableRow";
-const UsersTable = ({ users, onUserItemDelete, onSaveUserButtonClick }) => {
+const UsersTable = ({ users, onUserItemDelete, onUserUpdate }) => {
   if (users.length === 0) {
     return <p>No data</p>;
   }
@@ -33,7 +33,7 @@ const UsersTable = ({ users, onUserItemDelete, onSaveUserButtonClick }) => {
               key={user.id}
               user={user}
               onUserDelete={onUserItemDelete}
-              onUserUpdate={onSaveUserButtonClick}
+              onUserUpdate={onUserUpdate}
             />
           ))}
         </TableBody>
