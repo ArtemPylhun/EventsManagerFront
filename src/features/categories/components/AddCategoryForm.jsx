@@ -4,13 +4,13 @@ import { useValidateCategory } from "../hooks/useValidateCategory";
 import { Button, TextField, Container } from "@mui/material";
 import { useNotifications } from "../../../contexts/notifications/useNotifications";
 
-const AddCategoryForm = ({ setCategories }) => {
+const AddCategoryForm = ({ onAddCategory }) => {
   const categoryInitial = {
     name: "",
     description: "",
   };
   const [newCategory, setNewCategory] = useState(categoryInitial);
-  const { validationError, validateCategory } = useValidateCategory();
+  const { validateCategory } = useValidateCategory();
   const { showNotification } = useNotifications();
 
   const onCategoryChange = (event) => {
@@ -23,7 +23,11 @@ const AddCategoryForm = ({ setCategories }) => {
 
   const onSubmit = (event) => {
     event.preventDefault();
-    if (!validateCategory(newCategory.name, newCategory.description)) {
+    const validationError = validateCategory(
+      newCategory.name,
+      newCategory.description
+    );
+    if (validationError) {
       showNotification(validationError, {
         severity: "error",
         autoHideDuration: 5000,
@@ -42,7 +46,7 @@ const AddCategoryForm = ({ setCategories }) => {
           severity: "success",
           autoHideDuration: 5000,
         });
-        setCategories((prev) => [...prev, { ...newCategory, id: response.id }]);
+        onAddCategory(response);
         setNewCategory(categoryInitial);
       } catch (error) {
         if (error.response && error.response.status === 409) {
