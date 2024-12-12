@@ -1,17 +1,21 @@
-import React, { useEffect, useState, useCallback } from "react";
+import React, { useEffect, useState, useCallback, useReducer } from "react";
 import { CategoryService } from "../../services/category.service";
 import CategoriesTable from "./CategoriesTable";
 import SearchInput from "../../../../components/common/SearchInput";
 import AddCategoryForm from "../AddCategoryForm";
 import { useValidateCategory } from "../../hooks/useValidateCategory";
+import { useLoading } from "../../hooks/useLoading";
 import { useNotifications } from "../../../../contexts/notifications/useNotifications";
+import { CategoriesCrudActionTypes } from "../../actions";
+import categoriesReducer from "../../reducer";
 
 const CategoryComponent = () => {
-  const [categories, setCategories] = useState([]);
-  const [loading, setLoading] = useState(false);
+  const [state, dispatch] = useReducer(categoriesReducer, []);
+
+  const { loading, turnOnLoading, turnOffLoading } = useLoading(false);
   const [filterQuery, setFilterQuery] = useState("");
 
-  const { validateCategory, validationError } = useValidateCategory();
+  const { validateCategory } = useValidateCategory();
 
   const { showNotification } = useNotifications();
 
@@ -21,13 +25,17 @@ const CategoryComponent = () => {
 
     const fetchCategories = async () => {
       try {
-        setLoading(true);
+        turnOnLoading();
 
         const response = await CategoryService.getAllCategories(
           abortController.signal
         );
+        console.log("response", response);
         if (isMounted) {
-          setCategories(response);
+          dispatch({
+            type: CategoriesCrudActionTypes.SET_CATEGORIES,
+            payload: response,
+          });
         }
       } catch (error) {
         showNotification(error.message, {
@@ -35,7 +43,7 @@ const CategoryComponent = () => {
           autoHideDuration: 5000,
         });
       } finally {
-        setLoading(false);
+        turnOffLoading();
       }
     };
 
@@ -49,12 +57,12 @@ const CategoryComponent = () => {
 
   const memoizedCategoryItemDeleteCallback = useCallback(async (id) => {
     try {
-      setLoading(true);
+      turnOnLoading();
 
       const makeDeleteApiRequest = async (signal) => {
         try {
           await CategoryService.deleteCategoryById(id, signal);
-          setCategories((prev) => prev.filter((el) => el.id !== id));
+          dispatch({ type: "DELETE_CATEGORY", payload: { id: id } });
           showNotification("Category deleted successfully", {
             severity: "success",
             autoHideDuration: 5000,
@@ -78,24 +86,24 @@ const CategoryComponent = () => {
       const abortController = new AbortController();
       await makeDeleteApiRequest(abortController.signal);
 
-      setLoading(false);
+      turnOffLoading();
     } catch (error) {
       showNotification(error.message, {
         severity: "error",
         autoHideDuration: 5000,
       });
-      setLoading(false);
+      turnOffLoading();
     }
   }, []);
 
   const memoizedSaveCategoryButtonClickCallback = useCallback(
     async (editCategory) => {
-      const isValid = validateCategory(
+      const validationError = validateCategory(
         editCategory.name,
         editCategory.description
       );
 
-      if (!isValid) {
+      if (validationError !== "") {
         showNotification(validationError, {
           severity: "error",
           autoHideDuration: 5000,
@@ -113,14 +121,7 @@ const CategoryComponent = () => {
               signal
             );
 
-            setCategories((prev) =>
-              prev.map((el) => {
-                if (el.id === editCategory.id) {
-                  return editCategory;
-                }
-                return el;
-              })
-            );
+            dispatch({ type: "UPDATE_CATEGORY", payload: response });
 
             showNotification("Category updated successfully", {
               severity: "success",
@@ -142,23 +143,41 @@ const CategoryComponent = () => {
         };
         await makeUpdateApiRequest();
       } catch (error) {
-        showNotification(error.message, {
-          severity: "error",
-          autoHideDuration: 5000,
-        });
+        if (error.status === 409) {
+          showNotification(error.response?.data, {
+            severity: "error",
+            autoHideDuration: 5000,
+          });
+        } else {
+          showNotification(error.message, {
+            severity: "error",
+            autoHideDuration: 5000,
+          });
+        }
       }
-
       return true;
     },
-    [validationError]
+    []
   );
+
+  const handleAddCategory = async (newCategory) => {
+    console.log("newCategory", newCategory),
+      dispatch({
+        type: CategoriesCrudActionTypes.CREATE_CATEGORY,
+        payload: {
+          id: newCategory.id,
+          name: newCategory.name,
+          description: newCategory.description,
+        },
+      });
+  };
 
   const handleFilterQueryChange = (event) => {
     setFilterQuery(event.target.value);
   };
 
   const filteredCategories =
-    categories?.filter((category) =>
+    state?.filter((category) =>
       Object.keys(category).some((key) => {
         if (key === "id") return false;
         return String(category[key])
@@ -175,7 +194,7 @@ const CategoryComponent = () => {
         onQueryChange={handleFilterQueryChange}
       />
 
-      <AddCategoryForm setCategories={setCategories} />
+      <AddCategoryForm onAddCategory={handleAddCategory} />
 
       <CategoriesTable
         categories={filteredCategories}

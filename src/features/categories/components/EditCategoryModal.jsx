@@ -17,6 +17,14 @@ const EditCategoryModal = ({ open, onClose, category, onSave }) => {
     }
   };
 
+  const onNameChange = (event) => {
+    setName(event.target.value);
+  };
+
+  const onDescriptionChange = (event) => {
+    setDescription(event.target.value);
+  };
+
   return (
     <Modal open={open} onClose={onClose}>
       <Box
@@ -38,13 +46,13 @@ const EditCategoryModal = ({ open, onClose, category, onSave }) => {
         <TextField
           label="Name"
           value={name}
-          onChange={(e) => setName(e.target.value)}
+          onChange={onNameChange}
           fullWidth
         />
         <TextField
           label="Description"
           value={description}
-          onChange={(e) => setDescription(e.target.value)}
+          onChange={onDescriptionChange}
           fullWidth
         />
         <Box display="flex" justifyContent="flex-end" gap={1}>

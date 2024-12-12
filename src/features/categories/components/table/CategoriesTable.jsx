@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useMemo } from "react";
 import {
   TableContainer,
   Table,
@@ -19,6 +19,19 @@ const CategoriesTable = ({
     return <p>No data</p>;
   }
 
+  const memoizedRows = useMemo(
+    () =>
+      categories.map((category) => (
+        <CategoryTableRow
+          key={category.id}
+          category={category}
+          onCategoryDelete={onCategoryItemDelete}
+          onCategoryUpdate={onSaveCategoryButtonClick}
+        />
+      )),
+    [categories, onCategoryItemDelete, onSaveCategoryButtonClick]
+  );
+
   return (
     <TableContainer component={Paper} sx={{ marginY: "1rem" }}>
       <Table>
@@ -29,16 +42,7 @@ const CategoriesTable = ({
             <TableCell align="center">Actions</TableCell>
           </TableRow>
         </TableHead>
-        <TableBody>
-          {categories.map((category) => (
-            <CategoryTableRow
-              key={category.id}
-              category={category}
-              onCategoryDelete={onCategoryItemDelete}
-              onCategoryUpdate={onSaveCategoryButtonClick}
-            />
-          ))}
-        </TableBody>
+        <TableBody>{memoizedRows}</TableBody>
       </Table>
     </TableContainer>
   );
