@@ -12,6 +12,7 @@ import { UserService } from "../services/user.service";
 import { useUserDialogContext } from "../../../contexts/userDialogContext/useUserDialogContext";
 import { useCreateValidateUser } from "../hooks/useCreateValidateUser";
 import { useUpdateValidateUser } from "../hooks/useUpdateValidateUser";
+import { useNotifications } from "../../../contexts/notifications/useNotifications";
 
 const initialUser = {
   id: "",
@@ -23,23 +24,18 @@ const initialUser = {
     lastName: "",
     phoneNumber: "",
     address: "",
+    birthDate: "",
   },
 };
 const UserModal = ({ user, setUsers, editMode }) => {
-  const [formData, setFormData] = useState(initialUser);
+  const [formData, setFormData] = useState(
+    user ? { ...user, profile: { ...user.profile } } : initialUser
+  );
   const [isLoading, setIsLoading] = useState(false);
-  const { isOpen, fields, closeDialog, setNotification } =
-    useUserDialogContext();
+  const { showNotification } = useNotifications();
+  const { isOpen, fields, closeDialog } = useUserDialogContext();
   const { validateCreateUser } = useCreateValidateUser();
   const { validateUpdateUser } = useUpdateValidateUser();
-
-  useEffect(() => {
-    if (user) {
-      setFormData(user);
-    } else {
-      setFormData(initialUser);
-    }
-  }, [user]);
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -59,7 +55,10 @@ const UserModal = ({ user, setUsers, editMode }) => {
     const { password, ...formDataWithoutPassword } = formData;
     const validationError = validateUpdateUser(formDataWithoutPassword);
     if (validationError) {
-      setNotification({ message: validationError, severity: "error" });
+      showNotification(validationError, {
+        severity: "error",
+        autoHideDuration: 5000,
+      });
       return null;
     }
     try {
@@ -67,17 +66,22 @@ const UserModal = ({ user, setUsers, editMode }) => {
         formDataWithoutPassword,
         signal
       );
-      setNotification({
-        message: "User updated successfully!",
+      showNotification("User updated successfully!", {
         severity: "success",
         autoHideDuration: 5000,
       });
       return response;
     } catch (error) {
       if (error.response && error.response.status === 409) {
-        setNotification({ message: error.response.data, severity: "error" });
+        showNotification(error.response.data, {
+          severity: "error",
+          autoHideDuration: 5000,
+        });
       } else {
-        setNotification({ message: error.message, severity: "error" });
+        showNotification(error.message, {
+          severity: "error",
+          autoHideDuration: 5000,
+        });
       }
       return null;
     }
@@ -86,21 +90,30 @@ const UserModal = ({ user, setUsers, editMode }) => {
   const makeCreateApiRequest = async (signal) => {
     const validationError = validateCreateUser(formData);
     if (validationError) {
-      setNotification({ message: validationError, severity: "error" });
+      showNotification(validationError, {
+        severity: "error",
+        autoHideDuration: 5000,
+      });
       return null;
     }
     try {
       const response = await UserService.registerUser(formData, signal);
-      setNotification({
-        message: "User created successfully!",
+      showNotification("User created successfully!", {
         severity: "success",
+        autoHideDuration: 5000,
       });
       return response;
     } catch (error) {
       if (error.response && error.response.status === 409) {
-        setNotification({ message: error.response.data, severity: "error" });
+        showNotification(error.response.data, {
+          severity: "error",
+          autoHideDuration: 5000,
+        });
       } else {
-        setNotification({ message: error.message, severity: "error" });
+        showNotification(error.message, {
+          severity: "error",
+          autoHideDuration: 5000,
+        });
       }
       return null;
     }
@@ -113,7 +126,11 @@ const UserModal = ({ user, setUsers, editMode }) => {
 
     if (editMode) {
       const updatedUser = await makeUpdateApiRequest(signal);
-      if (!updatedUser) return null;
+      if (!updatedUser) {
+        setIsLoading(false);
+        return null;
+      }
+      console.log("updatedUser before setUsers", updatedUser);
       setUsers((prevUsers) =>
         prevUsers.map((user) =>
           user.id === updatedUser.id ? updatedUser : user
@@ -121,7 +138,10 @@ const UserModal = ({ user, setUsers, editMode }) => {
       );
     } else {
       const createdUser = await makeCreateApiRequest(signal);
-      if (!createdUser) return null;
+      if (!createdUser) {
+        setIsLoading(false);
+        return null;
+      }
       setUsers((prevUsers) => [...prevUsers, createdUser]);
     }
     setIsLoading(false);
@@ -129,6 +149,7 @@ const UserModal = ({ user, setUsers, editMode }) => {
   };
 
   const handleClose = () => {
+    console.log(user);
     closeDialog();
   };
   return (
@@ -139,32 +160,50 @@ const UserModal = ({ user, setUsers, editMode }) => {
           top: "50%",
           left: "50%",
           transform: "translate(-50%, -50%)",
-          width: 400,
+          width: 300,
           bgcolor: "background.paper",
           boxShadow: 24,
           p: 4,
           borderRadius: 2,
         }}
       >
-        <Typography variant="h6" component="h2" gutterBottom>
+        <Typography color="black" variant="h6" component="h2" gutterBottom>
           {editMode ? `Edit User: ${formData.userName}` : "Create New User"}
         </Typography>
 
         <form onSubmit={handleSubmit}>
-          <Grid2 container spacing={2}>
+          <Grid2
+            pt={2}
+            display="flex"
+            flexDirection="column"
+            alignItems="center"
+            justifyContent="center"
+          >
             {fields.map((field) => {
               const fieldValue = field.includes(".")
                 ? field.split(".").reduce((obj, key) => obj[key], formData)
                 : formData[field];
 
               return (
-                <Grid2 xs={12} key={field}>
+                <Grid2
+                  xs={12}
+                  key={field}
+                  sx={{
+                    width: "100%",
+                    mb: field === "profile.birthDate" ? 0 : 2,
+                  }}
+                >
                   <TextField
                     fullWidth
-                    label={capitalizeFirstLetter(field)}
+                    label={formatInput(field)}
                     id={field}
                     name={field}
-                    value={fieldValue || ""} // Use the correct field value
+                    type={field === "profile.birthDate" ? "date" : "text"}
+                    value={
+                      field === "profile.birthDate" && fieldValue
+                        ? new Date(fieldValue).toISOString().split("T")[0]
+                        : fieldValue || ""
+                    }
                     onChange={handleInputChange}
                     disabled={isLoading}
                     variant="outlined"
@@ -177,6 +216,7 @@ const UserModal = ({ user, setUsers, editMode }) => {
           <Box sx={{ mt: 3, display: "flex", justifyContent: "space-between" }}>
             <Button
               variant="outlined"
+              type="button"
               color="error"
               onClick={handleClose}
               disabled={isLoading}
@@ -199,8 +239,11 @@ const UserModal = ({ user, setUsers, editMode }) => {
   );
 };
 
-const capitalizeFirstLetter = (string) => {
-  return string.charAt(0).toUpperCase() + string.slice(1);
+const formatInput = (string) => {
+  const parts = string.split("profile.");
+  return parts
+    .map((part) => part.charAt(0).toUpperCase() + part.slice(1))
+    .join("");
 };
 
 export default UserModal;

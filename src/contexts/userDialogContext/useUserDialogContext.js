@@ -1,12 +1,23 @@
-import { useContext, useRef } from "react";
+import { useContext } from "react";
 import { UserDialogContext } from "./userDialogContextProvider";
 export const useUserDialogContext = () => {
   const context = useContext(UserDialogContext);
-  console.log(context);
-  if (!context) {
-    throw new Error(
-      "useUserDialogContext must be used within a UserDialogProvider"
-    );
+  try {
+    if (!context) {
+      return {
+        isOpen: false,
+        fields: [],
+        userId: null,
+        openDialog: () => {},
+        closeDialog: () => {},
+        setLoading: () => {},
+        setFields: () => {},
+        setNotification: () => {},
+      };
+    }
+  } catch (error) {
+    console.log(error.message);
   }
+
   return context;
 };

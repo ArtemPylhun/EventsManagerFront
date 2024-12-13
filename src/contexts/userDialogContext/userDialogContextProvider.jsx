@@ -3,17 +3,12 @@ import { initialUserDialogState, userDialogReducer } from "./reducer";
 import {
   openDialogAction,
   closeDialogAction,
-  setLoadingAction,
   setFieldsAction,
-  showNotificationAction,
 } from "./actions";
-import { useNotifications } from "../notifications/useNotifications";
 
 export const UserDialogContext = createContext();
 
 export const UserDialogProvider = ({ children }) => {
-  const { showNotification } = useNotifications();
-
   const [state, dispatch] = useReducer(
     userDialogReducer,
     initialUserDialogState
@@ -27,18 +22,10 @@ export const UserDialogProvider = ({ children }) => {
     dispatch(closeDialogAction());
   };
 
-  const setLoading = (isLoading) => {
-    dispatch(setLoadingAction(isLoading));
-  };
-
   const setFields = (fields) => {
     dispatch(setFieldsAction(fields));
   };
 
-  const setNotification = (notification) => {
-    dispatch(showNotificationAction(notification));
-    showNotification(notification.message, { ...notification });
-  };
   return (
     <UserDialogContext.Provider
       value={{
@@ -47,9 +34,7 @@ export const UserDialogProvider = ({ children }) => {
         userId: state.userId,
         openDialog,
         closeDialog,
-        setLoading,
         setFields,
-        setNotification,
       }}
     >
       {children}

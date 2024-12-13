@@ -1,8 +1,5 @@
 import PageTitle from "../../components/common/PageTitle";
-import {
-  UserDialogContext,
-  UserDialogProvider,
-} from "../../contexts/userDialogContext/userDialogContextProvider";
+import { UserDialogProvider } from "../../contexts/userDialogContext/userDialogContextProvider";
 import UserComponent from "./components/table/UserComponent";
 
 const UserPage = () => {
