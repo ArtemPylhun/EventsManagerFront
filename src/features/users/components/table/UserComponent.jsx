@@ -1,5 +1,5 @@
-import React, { useEffect, useState, useCallback } from "react";
-import { Button } from "@mui/material";
+import React, { useState, useCallback } from "react";
+import { Button, Container } from "@mui/material";
 import UsersTable from "./UsersTable";
 import SearchInput from "../../../../components/common/SearchInput";
 import UserModal from "../UserModal";
@@ -79,8 +79,26 @@ const UserComponent = () => {
         query={filterQuery}
         onQueryChange={handleFilterQueryChange}
       />
-
-      <Button onClick={openCreateModal}>Add User</Button>
+      <Container
+        sx={{
+          display: "flex",
+          flexDirection: "row",
+          justifyContent: "flex-end",
+          pr: 2,
+        }}
+      >
+        <Button
+          variant="contained"
+          onClick={openCreateModal}
+          sx={{
+            fontSize: "1rem", // Increase the font size
+            padding: "10px 20px", // Adjust padding for a larger button
+            borderRadius: "8px", // Optional: make it slightly rounded
+          }}
+        >
+          Add
+        </Button>
+      </Container>
       <UsersTable
         users={filteredUsers}
         onUserItemDelete={memoizedUserItemDeleteCallback}

@@ -1,24 +1,10 @@
 import React from "react";
 import { Outlet } from "react-router-dom";
+import ResponsiveAppBar from "../../router/ResponsiveAppBar";
 const Layout = () => {
   return (
     <>
-      <nav>
-        <ul>
-          <li>
-            <a href="/">Home</a>
-          </li>
-          <li>
-            <a href="/users">Users</a>
-          </li>
-          <li>
-            <a href="/categories">Categories</a>
-          </li>
-          <li>
-            <a href="/tags">Tags</a>
-          </li>
-        </ul>
-      </nav>
+      <ResponsiveAppBar />
       <div className="content">
         <Outlet />
       </div>
