@@ -4,14 +4,25 @@ import { useEffect } from "react";
 const ProtectedRoute = ({ children, allowedRoles }) => {
   const navigate = useNavigate();
   const userJson = localStorage.getItem("user");
-
   const user = userJson ? JSON.parse(userJson) : null;
 
+  const isTokenExpired = () => {
+    if (!user?.exp) return true;
+    const expiryDate = new Date(user.exp * 1000);
+    console.log(expiryDate);
+    return expiryDate < new Date();
+  };
+
   useEffect(() => {
-    if (!user) {
+    if (!user || isTokenExpired()) {
+      localStorage.removeItem("user");
       navigate("/login");
     }
   }, [user, navigate]);
+
+  if (!user || isTokenExpired()) {
+    return null;
+  }
 
   return (
     <>

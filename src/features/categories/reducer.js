@@ -2,8 +2,6 @@ import { CategoriesCrudActionTypes } from "./actions";
 
 const categoriesReducer = (state = [], action) => {
   switch (action.type) {
-    case CategoriesCrudActionTypes.GET_ALL_CATEGORIES:
-      return action.payload;
     case CategoriesCrudActionTypes.CREATE_CATEGORY:
       return [
         ...state,

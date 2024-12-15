@@ -1,10 +1,10 @@
 import React from "react";
 import { Outlet } from "react-router-dom";
-import ResponsiveAppBar from "../../router/ResponsiveAppBar";
+import Header from "./Header";
 const Layout = () => {
   return (
     <>
-      <ResponsiveAppBar />
+      <Header />
       <div className="content">
         <Outlet />
       </div>
