@@ -1,10 +1,13 @@
 import Router from "./router/Router";
 import "./App.css";
+import { NotificationsProvider } from "./contexts/notifications/NotificationsProvider";
 
 function App() {
   return (
     <>
-      <Router />
+      <NotificationsProvider>
+        <Router />
+      </NotificationsProvider>
     </>
   );
 }

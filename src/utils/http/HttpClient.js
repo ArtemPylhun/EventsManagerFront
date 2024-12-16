@@ -4,7 +4,6 @@ export class HttpClient {
   constructor(configs, signal) {
     this.axiosInstance = axios.create({
       baseURL: configs.baseURL,
-      timeout: configs.timeout || 3000,
       headers: {
         "Content-Type": "application/json",
         Accept: "application/json",
@@ -15,8 +14,7 @@ export class HttpClient {
 
     this.signal = signal;
 
-    // Uncomment if you need interceptors
-    // this.initInterceptors();
+    this.initInterceptors();
   }
 
   async get(url, config = {}) {
@@ -54,19 +52,13 @@ export class HttpClient {
     }
   }
 
-  // Uncomment this method if you want to use interceptors
-  /*
   initInterceptors() {
     this.axiosInstance.interceptors.request.use(
       (config) => {
-        const apiKey = localStorage.getItem("apiKey") ?? "SrFeARsHHeiM2kaAABFGnnlk6Tgu4Wzt";
-        if (apiKey) {
-          config.params = { ...config.params, "api-key": apiKey };
+        const token = localStorage.getItem("token");
+        if (token) {
+          config.headers["Authorization"] = `Bearer ${token}`;
         }
-        // const token = localStorage.getItem("token");
-        // if (token) {
-        //   config.headers["Authorization"] = `Bearer ${token}`;
-        // }
         return config;
       },
       (error) => {
@@ -74,18 +66,27 @@ export class HttpClient {
         return Promise.reject(error);
       }
     );
-
     this.axiosInstance.interceptors.response.use(
       (response) => response,
       (error) => {
-        if (error instanceof AxiosError && error.response?.status === 401) {
-          console.error("Unauthorized request");
-          window.location.href = "/login?returnUrl=" + window.location.pathname;
-          // Refresh token logic can be added here if needed
+        if (error.response) {
+          console.error(
+            "Request failed with error:",
+            error.response.status,
+            error.response.data
+          );
+          if (error.response.status === 401) {
+            console.error("Unauthorized request");
+            window.location.href =
+              "/login?returnUrl=" + window.location.pathname;
+          }
+        } else if (error.request) {
+          console.error("No response received:", error.request);
+        } else {
+          console.error("Unexpected error occurred", error.message);
         }
         return Promise.reject(error);
       }
     );
   }
-  */
 }
