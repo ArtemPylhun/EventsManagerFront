@@ -1,10 +1,14 @@
-import React from "react";
+import React, { useState } from "react";
 import { TableRow, TableCell, Button, Box } from "@mui/material";
-import { useUserDialogContext } from "../../../../contexts/userDialogContext/useUserDialogContext";
 import UserModal from "../UserModal";
+import DeleteConfirmationModal from "../../../../components/common/DeleteConfirmationModal";
+import { useUserDialogContext } from "../../../../contexts/userDialogContext/useUserDialogContext";
 
 const UserTableRow = ({ user, onUserDelete, onUserUpdate }) => {
+  const [isDeleteModalOpen, setDeleteModalOpen] = useState(false);
+
   const { openDialog, isOpen, userId } = useUserDialogContext();
+
   const openEditModal = () => {
     openDialog(user.id, [
       "userName",
@@ -14,8 +18,13 @@ const UserTableRow = ({ user, onUserDelete, onUserUpdate }) => {
       "profile.birthDate",
     ]);
   };
+
+  const openDeleteModal = () => setDeleteModalOpen(true);
+  const closeDeleteModal = () => setDeleteModalOpen(false);
+
   const handleDelete = () => {
     onUserDelete(user.id);
+    closeDeleteModal();
   };
   return (
     <>
@@ -32,7 +41,7 @@ const UserTableRow = ({ user, onUserDelete, onUserUpdate }) => {
             <Button onClick={openEditModal} variant="outlined" color="primary">
               Edit
             </Button>
-            <Button onClick={handleDelete} variant="contained" color="error">
+            <Button onClick={openDeleteModal} variant="contained" color="error">
               Delete
             </Button>
           </Box>
@@ -41,6 +50,13 @@ const UserTableRow = ({ user, onUserDelete, onUserUpdate }) => {
       {isOpen && user.id === userId && (
         <UserModal user={user} setUsers={onUserUpdate} editMode />
       )}
+      <DeleteConfirmationModal
+        open={isDeleteModalOpen}
+        onClose={closeDeleteModal}
+        onConfirm={handleDelete}
+        title="Confirm Delete"
+        description={`Are you sure you want to delete the user "${user.userName}"? This action cannot be undone.`}
+      />
     </>
   );
 };

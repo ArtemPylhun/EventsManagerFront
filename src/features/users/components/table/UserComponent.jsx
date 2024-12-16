@@ -7,12 +7,15 @@ import { UserService } from "../../services/user.service";
 import { useUserDialogContext } from "../../../../contexts/userDialogContext/useUserDialogContext";
 import { useNotifications } from "../../../../contexts/notifications/useNotifications";
 import { useGetUsers } from "../../hooks/useGetUsers";
+import LoaderComponent from "../../../../components/common/Loader";
 
 const UserComponent = () => {
   const [filterQuery, setFilterQuery] = useState("");
+
   const { openDialog, userId, isOpen } = useUserDialogContext();
   const { showNotification } = useNotifications();
-  const { users, loading, setUsers, setLoading } = useGetUsers();
+  const { users, loading, setUsers, turnOffLoading, turnOnLoading } =
+    useGetUsers();
 
   const openCreateModal = () => {
     openDialog(null, ["email", "userName", "password"]);
@@ -20,7 +23,7 @@ const UserComponent = () => {
 
   const memoizedUserItemDeleteCallback = useCallback(async (id) => {
     try {
-      setLoading(true);
+      turnOnLoading();
 
       const makeDeleteApiRequest = async (signal) => {
         try {
@@ -48,13 +51,13 @@ const UserComponent = () => {
       const abortController = new AbortController();
       await makeDeleteApiRequest(abortController.signal);
 
-      setLoading(false);
+      turnOffLoading();
     } catch (error) {
       showNotification(error.message, {
         severity: "error",
         autoHideDuration: 5000,
       });
-      setLoading(false);
+      turnOffLoading();
     }
   }, []);
 
@@ -64,17 +67,23 @@ const UserComponent = () => {
 
   const filteredUsers =
     users?.filter((user) => {
-      return Object.keys(user).some((key) => {
-        if (key === "id") return false;
-        return String(user[key])
-          .toLowerCase()
-          .includes(filterQuery.toLowerCase());
-      });
+      const query = filterQuery.toLowerCase();
+
+      // Helper function to search recursively in nested objects
+      const searchObject = (obj) => {
+        return Object.values(obj).some((value) => {
+          if (typeof value === "object" && value !== null) {
+            return searchObject(value); // Recursive call for nested objects
+          }
+          return String(value).toLowerCase().includes(query);
+        });
+      };
+
+      return searchObject(user);
     }) || [];
 
   return (
     <div>
-      {loading && <p>Loading...</p>}
       <SearchInput
         query={filterQuery}
         onQueryChange={handleFilterQueryChange}
@@ -91,22 +100,24 @@ const UserComponent = () => {
           variant="contained"
           onClick={openCreateModal}
           sx={{
-            fontSize: "1rem", // Increase the font size
-            padding: "10px 20px", // Adjust padding for a larger button
-            borderRadius: "8px", // Optional: make it slightly rounded
+            fontSize: "1rem",
+            padding: "10px 20px",
+            borderRadius: "8px",
           }}
         >
           Add
         </Button>
       </Container>
-      <UsersTable
-        users={filteredUsers}
-        onUserItemDelete={memoizedUserItemDeleteCallback}
-        onUserUpdate={setUsers}
-      />
-      {isOpen && userId === null && (
-        <UserModal user={null} setUsers={setUsers} editMode={false} />
-      )}
+      <LoaderComponent loading={loading}>
+        <UsersTable
+          users={filteredUsers}
+          onUserItemDelete={memoizedUserItemDeleteCallback}
+          onUserUpdate={setUsers}
+        />
+        {isOpen && userId === null && (
+          <UserModal user={null} setUsers={setUsers} editMode={false} />
+        )}
+      </LoaderComponent>
     </div>
   );
 };

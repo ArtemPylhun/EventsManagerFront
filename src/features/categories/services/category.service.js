@@ -27,24 +27,6 @@ export class CategoryService {
   }
 
   /**
-   * @param {number} limit
-   * @param {number} skip
-   * @param {AbortSignal} signal
-   */
-  /*
-  static async getPaginatedTodos(limit, skip, signal) {
-    const apiUrl = import.meta.env.VITE_API_BASE_URL;
-    const httpClient = new HttpClient({
-      baseURL: `${apiUrl}/categories`,
-      signal,
-    });
-    return await httpClient.get(
-      `?limit=${limit}&skip=${skip}`
-    );
-  }
-  */
-
-  /**
    * @param {object} category
    * @param {AbortSignal} signal
    */

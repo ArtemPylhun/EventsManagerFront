@@ -9,19 +9,19 @@ export const useUpdateValidateUser = () => {
 
     if (
       request.profile.fullName &&
-      request.profile.fullName.trim().length === 0
+      request.profile.fullName.trim().length < 6
     ) {
-      return "The full name is required";
+      return "The full name must be at least 6 letters long";
     }
 
-    const strongPhoneNumberRegex =
-      /^\+?[0-9]{0,4}?[-.\s]?(\([0-9]{1,6}\)|[0-9]{1,6})[-.\s]?[0-9]{1,6}([-.\s]?[0-9]{1,6})?$/;
+    const ukrainianPhoneNumberRegex =
+      /^\+38\s?(0\d{2})\s?(\d{3})\s?(\d{2})\s?(\d{2})$/;
 
     if (
       request.profile.phoneNumber &&
-      !strongPhoneNumberRegex.test(request.profile.phoneNumber)
+      !ukrainianPhoneNumberRegex.test(request.profile.phoneNumber)
     ) {
-      return "The phone number must be valid (e.g. +1 123-456-7890)";
+      return "The phone number must be a valid Ukrainian number (e.g., +38 096 620 12 12)";
     }
     if (
       request.profile.address &&
@@ -30,32 +30,23 @@ export const useUpdateValidateUser = () => {
       return "The address is required";
     }
 
-    const dateRegex = /^\d{2}\.\d{2}\.\d{4}$/;
-
     const isValidDate = (dateString) => {
-      // Convert ISO string (if present) to DD.MM.YYYY
-      const date = new Date(dateString);
-      if (Number.isNaN(date.getTime())) {
-        return false; // Invalid date
+      const limitDateTime = new Date("2008-12-15T23:49:30");
+
+      if (new Date(dateString) >= limitDateTime) {
+        return {
+          isValid: false,
+          message: "The birth date must be lower than 15.12.2008",
+        };
       }
-
-      // Format the date to DD.MM.YYYY for validation
-      const day = String(date.getDate()).padStart(2, "0");
-      const month = String(date.getMonth() + 1).padStart(2, "0"); // Months are 0-based
-      const year = date.getFullYear();
-      const formattedDate = `${day}.${month}.${year}`;
-
-      // Validate against the regex
-      if (!dateRegex.test(formattedDate)) {
-        return false; // Invalid format
-      }
-
-      return true;
+      return { isValid: true };
     };
 
-    // Validation check
-    if (request.profile.birthDate && !isValidDate(request.profile.birthDate)) {
-      return "The birth date must be valid and in the format DD.MM.YYYY";
+    if (request.profile.birthDate) {
+      const validation = isValidDate(request.profile.birthDate);
+      if (!validation.isValid) {
+        return validation.message;
+      }
     }
 
     return "";

@@ -18,7 +18,6 @@ const CategoriesTable = ({
   if (categories.length === 0) {
     return <p>No data</p>;
   }
-
   const memoizedRows = useMemo(
     () =>
       categories.map((category) => (

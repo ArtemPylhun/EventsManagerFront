@@ -1,5 +1,5 @@
-import { Snackbar, Alert } from "@mui/material";
 import { memo } from "react";
+import { Snackbar, Alert } from "@mui/material";
 
 const NotificationsSnackbar = memo(({ notifications, closeNotification }) => {
   const handleClose = (key) => () => {

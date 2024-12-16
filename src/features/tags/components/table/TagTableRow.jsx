@@ -1,9 +1,12 @@
 import React, { useState } from "react";
 import { TableRow, TableCell, Button, Box } from "@mui/material";
 import EditTagModal from "../EditTagModal";
+import DeleteConfirmationModal from "../../../../components/common/DeleteConfirmationModal";
 
 const TagTableRow = ({ tag, onTagDelete, onTagUpdate }) => {
   const [isEditModalOpen, setEditModalOpen] = useState(false);
+  const [isDeleteModalOpen, setDeleteModalOpen] = useState(false);
+
   const openModal = () => {
     setEditModalOpen(true);
   };
@@ -18,8 +21,12 @@ const TagTableRow = ({ tag, onTagDelete, onTagUpdate }) => {
       closeModal();
     }
   };
+
+  const openDeleteModal = () => setDeleteModalOpen(true);
+  const closeDeleteModal = () => setDeleteModalOpen(false);
   const handleDelete = () => {
     onTagDelete(tag.id);
+    closeDeleteModal();
   };
 
   return (
@@ -31,17 +38,26 @@ const TagTableRow = ({ tag, onTagDelete, onTagUpdate }) => {
             <Button onClick={openModal} variant="outlined" color="primary">
               Edit
             </Button>
-            <Button onClick={handleDelete} variant="contained" color="error">
+            <Button onClick={openDeleteModal} variant="contained" color="error">
               Delete
             </Button>
           </Box>
         </TableCell>
       </TableRow>
+
       <EditTagModal
         open={isEditModalOpen}
         onClose={closeModal}
         tag={tag}
         onSave={handleSave}
+      />
+
+      <DeleteConfirmationModal
+        open={isDeleteModalOpen}
+        onClose={closeDeleteModal}
+        onConfirm={handleDelete}
+        title="Confirm Delete"
+        description={`Are you sure you want to delete the tag "${tag.title}"? This action cannot be undone.`}
       />
     </>
   );

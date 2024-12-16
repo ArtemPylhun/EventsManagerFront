@@ -1,7 +1,7 @@
 import React, { useState } from "react";
+import { Button, TextField, Container } from "@mui/material";
 import { TagService } from "../services/tag.service";
 import { useValidateTag } from "../hooks/useValidateTag";
-import { Button, TextField, Container } from "@mui/material";
 import { useNotifications } from "../../../contexts/notifications/useNotifications";
 
 const AddTagForm = ({ setTags }) => {
@@ -10,8 +10,9 @@ const AddTagForm = ({ setTags }) => {
   };
 
   const [newTag, setNewTag] = useState(tagInitial);
-  let { validationError, validateTag } = useValidateTag();
+
   const { showNotification } = useNotifications();
+  let { validateTag } = useValidateTag();
 
   const onTagChange = (event) => {
     const { name, value } = event.target;
@@ -23,7 +24,8 @@ const AddTagForm = ({ setTags }) => {
 
   const onSubmit = async (event) => {
     event.preventDefault();
-    if (!validateTag(newTag.title)) {
+    const validationError = validateTag(newTag.title);
+    if (validationError) {
       showNotification(validationError, {
         severity: "error",
         autoHideDuration: 5000,

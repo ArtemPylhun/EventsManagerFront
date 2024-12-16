@@ -15,6 +15,10 @@ const EditTagModal = ({ open, onClose, tag, onSave }) => {
     }
   };
 
+  const onTitleChange = (event) => {
+    setTitle(event.target.value);
+  };
+
   return (
     <Modal open={open} onClose={onClose}>
       <Box
@@ -36,7 +40,7 @@ const EditTagModal = ({ open, onClose, tag, onSave }) => {
         <TextField
           label="Title"
           value={title}
-          onChange={(e) => setTitle(e.target.value)}
+          onChange={onTitleChange}
           fullWidth
         />
         <Box display="flex" justifyContent="flex-end" gap={1}>

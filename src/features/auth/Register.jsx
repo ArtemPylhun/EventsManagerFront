@@ -1,10 +1,8 @@
-
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { UserService } from "../users/services/user.service";
-
+import { useNotifications } from "../../contexts/notifications/useNotifications";
 import { Button, Container, TextField } from "@mui/material";
-
 const Register = () => {
   const userInitial = {
     email: "",
@@ -12,9 +10,10 @@ const Register = () => {
     userName: "",
   };
 
-
-  const navigate = useNavigate();
   const [user, setUser] = useState(userInitial);
+
+  const { showNotification } = useNotifications();
+  const navigate = useNavigate();
 
   const handleUserChange = (event) => {
     const { name, value } = event.target;
@@ -28,13 +27,12 @@ const Register = () => {
     event.preventDefault();
 
     if (!user.password.match(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{8,}$/)) {
-      setErrors({
-        password:
-          "Password must be at least 8 characters long, include an uppercase letter, a number, and a special character",
-      });
+      showNotification(
+        "Password must be at least 8 characters long, include an uppercase letter, a number, and a special character",
+        { severity: "error", audoHideDuration: 5000 }
+      );
       return;
     }
-
 
     const response = await UserService.register(user);
 

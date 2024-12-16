@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import {
   Modal,
   Box,
@@ -32,6 +32,7 @@ const UserModal = ({ user, setUsers, editMode }) => {
     user ? { ...user, profile: { ...user.profile } } : initialUser
   );
   const [isLoading, setIsLoading] = useState(false);
+
   const { showNotification } = useNotifications();
   const { isOpen, fields, closeDialog } = useUserDialogContext();
   const { validateCreateUser } = useCreateValidateUser();
@@ -130,7 +131,6 @@ const UserModal = ({ user, setUsers, editMode }) => {
         setIsLoading(false);
         return null;
       }
-      console.log("updatedUser before setUsers", updatedUser);
       setUsers((prevUsers) =>
         prevUsers.map((user) =>
           user.id === updatedUser.id ? updatedUser : user

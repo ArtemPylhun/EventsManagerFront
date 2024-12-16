@@ -1,15 +1,17 @@
 import { useState, useEffect } from "react";
 import { UserService } from "../services/user.service";
 import { useNotifications } from "../../../contexts/notifications/useNotifications";
+import { useLoading } from "../../../hooks/useLoading";
 
 export const useGetUsers = () => {
   const [users, setUsers] = useState([]);
-  const [loading, setLoading] = useState(false);
+
+  const { loading, turnOnLoading, turnOffLoading } = useLoading(false);
   const { showNotification } = useNotifications();
 
   const fetchUsers = async (signal) => {
     try {
-      setLoading(true);
+      turnOnLoading();
       const response = await UserService.getAllUsers(signal);
       setUsers(response);
     } catch (error) {
@@ -18,7 +20,7 @@ export const useGetUsers = () => {
         autoHideDuration: 5000,
       });
     } finally {
-      setLoading(false);
+      turnOffLoading();
     }
   };
 
@@ -28,5 +30,12 @@ export const useGetUsers = () => {
     return () => abortController.abort();
   }, []);
 
-  return { users, loading, setUsers, setLoading, fetchUsers };
+  return {
+    users,
+    loading,
+    setUsers,
+    turnOnLoading,
+    turnOffLoading,
+    fetchUsers,
+  };
 };

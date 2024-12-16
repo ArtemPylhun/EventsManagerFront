@@ -1,19 +1,20 @@
 import React, { useEffect, useState, useCallback } from "react";
-import { TagService } from "../../services/tag.service";
 import TagsTable from "../../../tags/components/table/TagsTable";
 import SearchInput from "../../../../components/common/SearchInput";
 import AddTagForm from "../AddTagForm";
+import LoaderComponent from "../../../../components/common/Loader";
+import { TagService } from "../../services/tag.service";
 import { useValidateTag } from "../../hooks/useValidateTag";
 import { useNotifications } from "../../../../contexts/notifications/useNotifications";
+import { useLoading } from "../../../../hooks/useLoading";
 
 const TagComponent = () => {
   const [tags, setTags] = useState([]);
-  const [loading, setLoading] = useState(false);
   const [filterQuery, setFilterQuery] = useState("");
 
-  const { validateTag, validationError } = useValidateTag();
-
+  const { loading, turnOnLoading, turnOffLoading } = useLoading(false);
   const { showNotification } = useNotifications();
+  const { validateTag } = useValidateTag();
 
   useEffect(() => {
     let isMounted = true;
@@ -21,7 +22,7 @@ const TagComponent = () => {
 
     const fetchTags = async () => {
       try {
-        setLoading(true);
+        turnOnLoading();
         const response = await TagService.getAllTags(abortController.signal);
         if (isMounted) {
           setTags(response);
@@ -32,7 +33,7 @@ const TagComponent = () => {
           autoHideDuration: 5000,
         });
       } finally {
-        setLoading(false);
+        turnOffLoading();
       }
     };
 
@@ -46,7 +47,7 @@ const TagComponent = () => {
 
   const memoizedTagItemDeleteCallback = useCallback(async (id) => {
     try {
-      setLoading(true);
+      turnOnLoading();
 
       const makeDeleteApiRequest = async (signal) => {
         try {
@@ -57,7 +58,6 @@ const TagComponent = () => {
             autoHideDuration: 5000,
           });
         } catch (error) {
-          console.log(error);
           if (error.response && error.response.status === 409) {
             showNotification(error.response.data, {
               severity: "error",
@@ -75,72 +75,63 @@ const TagComponent = () => {
       const abortController = new AbortController();
       await makeDeleteApiRequest(abortController.signal);
 
-      setLoading(false);
+      turnOffLoading();
     } catch (error) {
       showNotification(error.message, {
         severity: "error",
         autoHideDuration: 5000,
       });
-      setLoading(false);
+      turnOffLoading();
     }
   }, []);
 
-  const memoizedSaveTagButtonClickCallback = useCallback(
-    async (editTag) => {
-      const isValid = validateTag(editTag.title);
-      if (!isValid) {
-        showNotification(validationError, {
-          severity: "error",
-          autoHideDuration: 5000,
-        });
-        return false;
-      }
-
-      try {
-        const makeUpdateApiRequest = async () => {
-          try {
-            const abortController = new AbortController();
-            const signal = abortController.signal;
-            const response = await TagService.updateTag(editTag, signal);
-
-            setTags((prev) =>
-              prev.map((el) => {
-                if (el.id === editTag.id) {
-                  return editTag;
-                }
-                return el;
-              })
-            );
-            showNotification("Tag updated successfully", {
-              severity: "success",
+  const memoizedSaveTagButtonClickCallback = useCallback(async (editTag) => {
+    const validationError = validateTag(editTag.title);
+    if (validationError) {
+      showNotification(validationError, {
+        severity: "error",
+        autoHideDuration: 5000,
+      });
+      return false;
+    }
+    try {
+      const makeUpdateApiRequest = async () => {
+        try {
+          const abortController = new AbortController();
+          const signal = abortController.signal;
+          const response = await TagService.updateTag(editTag, signal);
+          setTags((prev) =>
+            prev.map((el) => (el.id === response.id ? response : el))
+          );
+          showNotification("Tag updated successfully", {
+            severity: "success",
+            autoHideDuration: 5000,
+          });
+          return response;
+        } catch (error) {
+          if (error.response && error.response.status === 409) {
+            showNotification(error.response.data, {
+              severity: "error",
               autoHideDuration: 5000,
             });
-          } catch (error) {
-            console.log(error);
-            if (error.status === 409) {
-              showNotification(error.response?.data, {
-                severity: "error",
-                autoHideDuration: 5000,
-              });
-            } else {
-              showNotification(error.message, {
-                severity: "error",
-                autoHideDuration: 5000,
-              });
-            }
+          } else {
+            showNotification(error.message, {
+              severity: "error",
+              autoHideDuration: 5000,
+            });
           }
-        };
-        await makeUpdateApiRequest();
-      } catch (error) {
-        showNotification(error.message, {
-          severity: "error",
-          autoHideDuration: 5000,
-        });
-      }
-      return true;
-    },
-    [validationError]
-  );
+          return null;
+        }
+      };
+      await makeUpdateApiRequest();
+    } catch (error) {
+      showNotification(error.message, {
+        severity: "error",
+        autoHideDuration: 5000,
+      });
+    }
+    return true;
+  }, []);
 
   const handleFilterQueryChange = (event) => {
     setFilterQuery(event.target.value);
@@ -158,7 +149,6 @@ const TagComponent = () => {
 
   return (
     <div>
-      {loading && <p>Loading...</p>}
       <SearchInput
         query={filterQuery}
         onQueryChange={handleFilterQueryChange}
@@ -166,11 +156,13 @@ const TagComponent = () => {
 
       <AddTagForm setTags={setTags} />
 
-      <TagsTable
-        tags={filteredTags}
-        onTagItemDelete={memoizedTagItemDeleteCallback}
-        onSaveTagButtonClick={memoizedSaveTagButtonClickCallback}
-      />
+      <LoaderComponent loading={loading}>
+        <TagsTable
+          tags={filteredTags}
+          onTagItemDelete={memoizedTagItemDeleteCallback}
+          onSaveTagButtonClick={memoizedSaveTagButtonClickCallback}
+        />
+      </LoaderComponent>
     </div>
   );
 };

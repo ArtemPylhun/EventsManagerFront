@@ -9,7 +9,6 @@ const ProtectedRoute = ({ children, allowedRoles }) => {
   const isTokenExpired = () => {
     if (!user?.exp) return true;
     const expiryDate = new Date(user.exp * 1000);
-    console.log(expiryDate);
     return expiryDate < new Date();
   };
 

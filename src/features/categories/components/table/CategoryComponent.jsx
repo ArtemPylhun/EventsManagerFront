@@ -1,23 +1,22 @@
 import React, { useEffect, useState, useCallback, useReducer } from "react";
-import { CategoryService } from "../../services/category.service";
 import CategoriesTable from "./CategoriesTable";
 import SearchInput from "../../../../components/common/SearchInput";
 import AddCategoryForm from "../AddCategoryForm";
+import categoriesReducer from "../../store/reducer";
+import LoaderComponent from "../../../../components/common/Loader";
+import { CategoriesCrudActionTypes } from "../../store/actions";
+import { CategoryService } from "../../services/category.service";
 import { useValidateCategory } from "../../hooks/useValidateCategory";
-import { useLoading } from "../../hooks/useLoading";
+import { useLoading } from "../../../../hooks/useLoading";
 import { useNotifications } from "../../../../contexts/notifications/useNotifications";
-import { CategoriesCrudActionTypes } from "../../actions";
-import categoriesReducer from "../../reducer";
 
 const CategoryComponent = () => {
   const [state, dispatch] = useReducer(categoriesReducer, []);
-
-  const { loading, turnOnLoading, turnOffLoading } = useLoading(false);
   const [filterQuery, setFilterQuery] = useState("");
 
-  const { validateCategory } = useValidateCategory();
-
+  const { loading, turnOnLoading, turnOffLoading } = useLoading(false);
   const { showNotification } = useNotifications();
+  const { validateCategory } = useValidateCategory();
 
   useEffect(() => {
     let isMounted = true;
@@ -30,7 +29,6 @@ const CategoryComponent = () => {
         const response = await CategoryService.getAllCategories(
           abortController.signal
         );
-        console.log("response", response);
         if (isMounted) {
           dispatch({
             type: CategoriesCrudActionTypes.SET_CATEGORIES,
@@ -68,7 +66,6 @@ const CategoryComponent = () => {
             autoHideDuration: 5000,
           });
         } catch (error) {
-          console.log(error);
           if (error.response && error.response.status === 409) {
             showNotification(error.response.data, {
               severity: "error",
@@ -161,15 +158,14 @@ const CategoryComponent = () => {
   );
 
   const handleAddCategory = async (newCategory) => {
-    console.log("newCategory", newCategory),
-      dispatch({
-        type: CategoriesCrudActionTypes.CREATE_CATEGORY,
-        payload: {
-          id: newCategory.id,
-          name: newCategory.name,
-          description: newCategory.description,
-        },
-      });
+    dispatch({
+      type: CategoriesCrudActionTypes.CREATE_CATEGORY,
+      payload: {
+        id: newCategory.id,
+        name: newCategory.name,
+        description: newCategory.description,
+      },
+    });
   };
 
   const handleFilterQueryChange = (event) => {
@@ -188,19 +184,19 @@ const CategoryComponent = () => {
 
   return (
     <div>
-      {loading && <p>Loading...</p>}
       <SearchInput
         query={filterQuery}
         onQueryChange={handleFilterQueryChange}
       />
 
       <AddCategoryForm onAddCategory={handleAddCategory} />
-
-      <CategoriesTable
-        categories={filteredCategories}
-        onCategoryItemDelete={memoizedCategoryItemDeleteCallback}
-        onSaveCategoryButtonClick={memoizedSaveCategoryButtonClickCallback}
-      />
+      <LoaderComponent loading={loading}>
+        <CategoriesTable
+          categories={filteredCategories}
+          onCategoryItemDelete={memoizedCategoryItemDeleteCallback}
+          onSaveCategoryButtonClick={memoizedSaveCategoryButtonClickCallback}
+        />
+      </LoaderComponent>
     </div>
   );
 };

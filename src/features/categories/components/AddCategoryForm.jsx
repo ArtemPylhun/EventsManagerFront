@@ -1,7 +1,7 @@
 import { useState } from "react";
+import { Button, TextField, Container } from "@mui/material";
 import { CategoryService } from "../services/category.service";
 import { useValidateCategory } from "../hooks/useValidateCategory";
-import { Button, TextField, Container } from "@mui/material";
 import { useNotifications } from "../../../contexts/notifications/useNotifications";
 
 const AddCategoryForm = ({ onAddCategory }) => {
@@ -9,7 +9,9 @@ const AddCategoryForm = ({ onAddCategory }) => {
     name: "",
     description: "",
   };
+
   const [newCategory, setNewCategory] = useState(categoryInitial);
+
   const { validateCategory } = useValidateCategory();
   const { showNotification } = useNotifications();
 
